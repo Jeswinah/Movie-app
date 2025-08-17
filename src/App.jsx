@@ -11,7 +11,7 @@ function App() {
   return (
     <>
       <Navbar />
-      <div className=" ">
+      <div className="mb-5 p-0 ">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<SearchPage />} />

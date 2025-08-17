@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { MdMovie } from "react-icons/md";
-import { FiTv } from "react-icons/fi";
 import { SiThemoviedatabase } from "react-icons/si";
 import { FaHome, FaSearch } from "react-icons/fa";
 

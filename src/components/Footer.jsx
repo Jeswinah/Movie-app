@@ -15,14 +15,7 @@ const Footer = () => {
               <li>Terms of Service</li>
             </ul>
           </div>
-          <div className="content2 my-3 flex flex-col justify-center items-center">
-            <h3 className="text-lg sm:text-xl font-bold my-2 text-center">Links</h3>
-            <ul className="text-sm space-x-4 flex justify-center hover:cursor-pointer">
-              <Link to="/" className="hover:text-blue-400">Home</Link>
-              <Link to="/movies" className="hover:text-blue-400">Movies</Link>
-              <Link to="/series" className="hover:text-blue-400">Series</Link>
-            </ul>
-          </div>
+        
           <div className="content3 flex flex-col justify-center items-center my-3">
             <h3 className="text-lg sm:text-xl font-semibold">Connect with me</h3>
             <div className="social_links flex gap-6 my-2">

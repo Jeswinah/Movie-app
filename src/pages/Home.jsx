@@ -10,7 +10,14 @@ const Home = () => {
     try {
       const apiKey = import.meta.env.VITE_TMDB_API_KEY;
       if (!apiKey) throw new Error("TMDB API key is not defined. Please set VITE_TMDB_API_KEY in your .env file.");
-      const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`);
+      
+      // Use proxy on production (Vercel), direct API in development
+      const isDevelopment = import.meta.env.DEV;
+      const apiUrl = isDevelopment 
+        ? `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`
+        : `/api/tmdb?endpoint=/movie/popular`;
+      
+      const response = await axios.get(apiUrl);
       setMovies(response.data.results);
     } catch (error) {
       console.error("Error fetching movies:", error);

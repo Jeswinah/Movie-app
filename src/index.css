@@ -1,1 +1,30 @@
 @import "tailwindcss";
+
+/* Netflix-like theme variables and small utilities */
+:root {
+	--netflix-bg: #0b0b0b;
+	--netflix-dark: #0f141a;
+	--netflix-red: #e50914;
+	--netflix-muted: #b3b3b3;
+	--netflix-white: #ffffff;
+}
+
+html, body, #root {
+	height: 100%;
+}
+
+body {
+	background: var(--netflix-bg);
+	color: var(--netflix-white);
+	font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* small helpers used by components */
+.netflix-accent { color: var(--netflix-red); }
+.bg-netflix { background-color: var(--netflix-bg); }
+.bg-netflix-dark { background-color: var(--netflix-dark); }
+.text-muted { color: var(--netflix-muted); }
+.btn-netflix { background-color: var(--netflix-red); color: white; }
+
+/* utility for suggestion dropdown shadow and backdrop */
+.suggestion-card { background: rgba(15,20,26,0.95); box-shadow: 0 6px 20px rgba(0,0,0,0.6); }

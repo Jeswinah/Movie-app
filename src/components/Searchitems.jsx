@@ -5,9 +5,9 @@ const Searchitems = () => {
   const [searchval, setSearchval] = useState("");
   const navigate = useNavigate();
 
-  const Handlesearch = () => {
+  const handleSearch = () => {
     if (searchval.trim() !== "") {
-      navigate(`/search/${encodeURIComponent(searchval)}`);
+      navigate(`/search?query=${encodeURIComponent(searchval)}`);
       setSearchval("");
     }
   };
@@ -15,13 +15,13 @@ const Searchitems = () => {
   // For Search on Enter key press
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      Handlesearch();
+      handleSearch();
     }
   };
 
   return (
     <div>
-      <div className="search w-full flex justify-center">
+      <div className="search w-full flex justify-center ">
         <div className="w-full sm:w-4/6 lg:w-2/6 my-5 sm:my-8 flex items-center space-x-2 mx-3">
           <input
             type="text"
@@ -33,7 +33,7 @@ const Searchitems = () => {
           />
           <button
             className="bg-gray-700 rounded-2xl px-3 py-2 font-semibold text-white"
-            onClick={Handlesearch}
+            onClick={handleSearch}
           >
             Search
           </button>

@@ -1,21 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-const MovieDetails = () => {
+const MovieDetails = ({ setNavbarTransparent }) => {
   const { id } = useParams();
 
+  useEffect(() => {
+    // Set navbar to transparent when component mounts
+    if (setNavbarTransparent) {
+      setNavbarTransparent(true);
+    }
+  }, [setNavbarTransparent]);
+
   return (
-    <div className="w-screen h-screen bg-black">
+    <div className="fixed inset-0 w-full h-screen bg-black">
       <iframe
         src={`https://www.2embed.cc/embed/${id}`}
+        frameBorder="0"
+        allowFullScreen
         title="Movie Player"
         className="w-full h-full"
-        allowFullScreen
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        referrerPolicy="no-referrer-when-downgrade"
-        style={{ border: 'none' }}
       />
-    </div> 
+    </div>
   );
 };
 

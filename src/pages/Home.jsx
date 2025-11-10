@@ -2,23 +2,23 @@ import Card from "../components/Card";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MovieSlider from "../components/MovieSlider";
-const Home = () => {
+const Home = ({ setNavbarTransparent }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
   async function apihandler() {
     try {
       const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-      if (!apiKey) throw new Error("TMDB API key is not defined. Please set VITE_TMDB_API_KEY in your .env file.");
-      
-      // Use proxy on production (Vercel), direct API in development
-      const isDevelopment = import.meta.env.DEV;
-      const apiUrl = isDevelopment 
-        ? `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`
-        : `/api/tmdb?endpoint=/movie/popular`;
-      
-      const response = await axios.get(apiUrl);
-      setMovies(response.data.results);
+      let url;
+      if (import.meta.env.DEV) {
+        url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`;
+      } else {
+        // production uses server proxy
+        url = `/api/tmdb/movie/popular`;
+      }
+      const response = await axios.get(url);
+      // if proxied, the response shape may be the same
+      setMovies(response.data.results || response.data.results || []);
     } catch (error) {
       console.error("Error fetching movies:", error);
     } finally {
@@ -39,19 +39,17 @@ const Home = () => {
 
   const displayData = loading ? placeholderData : movies;
 
-  console.log(displayData);
-
   return (
-    <div className="grid place-content-center ">
-      <MovieSlider  movies={movies} />
-      <h1 className="text-4xl text-center py-5 font-mono bg-amber-50">Popular Movies</h1>
+    <div className="grid place-content-center">
+      <MovieSlider movies={movies} setNavbarTransparent={setNavbarTransparent} />
+      <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark">Popular Movies</h1>
       <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8">
         {displayData.map(({ id, title, backdrop_path, vote_average }) => {
           const imgUrl = backdrop_path
             ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
             : "https://placehold.co/300x168?text=Loading...";
           return (
-            <Card key={id} title={title} img={imgUrl} vote={vote_average} />
+            <Card key={id} id={id} title={title} img={imgUrl} vote={vote_average} />
           );
         })}
       </div>

@@ -6,7 +6,7 @@ const Footer = () => {
   const Fullyear = new Date().getFullYear();
   return (
     <div >
-      <footer className="bg-gray-800 w-full text-gray-200 h-fit ">
+      <footer className="bg-black opacity-60 mt-10 w-full text-gray-200 h-fit ">
         <div className="flex flex-col sm:flex-row justify-center sm:justify-around ">
           <div className="content1 flex flex-col items-center sm:my-8">
             <h3 className="text-lg sm:text-xl font-bold my-2">Legal & Policies</h3>

@@ -1,20 +1,23 @@
 import React from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const MovieDetails = () => {
   const { id } = useParams();
 
   return (
-    <div className="min-h-100 bg-black py-8 flex flex-col   justify-center items-center">
-      
-      <div className="w-full h-100  md:h-full  max-w-5xl aspect-video  overflow-hidden">
-        <iframe
-          src={`https://vidsrc.to/embed/movie/${id}`}
-          frameBorder="0"
-          allowFullScreen
-          title="Movie Player"
-          className="w-full h-full"
-        />
+    <div className="min-h-screen bg-black py-8 flex flex-col justify-center items-center">
+      <div className="w-full max-w-6xl px-4">
+        <div className="w-full aspect-video rounded-lg overflow-hidden shadow-2xl">
+          <iframe
+            src={`https://vidsrc.to/embed/movie/${id}`}
+            title="Movie Player"
+            className="w-full h-full"
+            allowFullScreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="no-referrer-when-downgrade"
+            style={{ border: 'none' }}
+          />
+        </div>
       </div>
     </div>
   );

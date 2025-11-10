@@ -8,7 +8,9 @@ const Home = () => {
 
   async function apihandler() {
     try {
-      const response = await axios.get("https://api.themoviedb.org/3/movie/popular?api_key=05054a63901c71f0817eb0028ead81f3");
+      const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+      if (!apiKey) throw new Error("TMDB API key is not defined. Please set VITE_TMDB_API_KEY in your .env file.");
+      const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`);
       setMovies(response.data.results);
     } catch (error) {
       console.error("Error fetching movies:", error);

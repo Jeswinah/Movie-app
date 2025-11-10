@@ -15,8 +15,11 @@ const SearchPage = () => {
       setLoading(true);
       setError(null);
       try {
-      
-        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=05054a63901c71f0817eb0028ead81f3&query=${encodeURIComponent(query)} `||`https://api.themoviedb.org/3/search/tv?api_key=05054a63901c71f0817eb0028ead81f3&query=${encodeURIComponent(query)}`);
+        const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+        if (!apiKey) throw new Error("TMDB API key is not defined. Please set VITE_TMDB_API_KEY in your .env file.");
+
+        const movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
+        const res = await fetch(movieUrl);
         if (!res.ok) {
           throw new Error("Failed to fetch movies");
         }

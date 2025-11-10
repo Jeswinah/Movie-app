@@ -5,21 +5,17 @@ const MovieDetails = () => {
   const { id } = useParams();
 
   return (
-    <div className="min-h-screen bg-black py-8 flex flex-col justify-center items-center">
-      <div className="w-full max-w-6xl px-4">
-        <div className="w-full aspect-video rounded-lg overflow-hidden shadow-2xl">
-          <iframe
-            src={`https://vidsrc.to/embed/movie/${id}`}
-            title="Movie Player"
-            className="w-full h-full"
-            allowFullScreen
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="no-referrer-when-downgrade"
-            style={{ border: 'none' }}
-          />
-        </div>
-      </div>
-    </div>
+    <div className="w-screen h-screen bg-black">
+      <iframe
+        src={`https://www.2embed.cc/embed/${id}`}
+        title="Movie Player"
+        className="w-full h-full"
+        allowFullScreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        referrerPolicy="no-referrer-when-downgrade"
+        style={{ border: 'none' }}
+      />
+    </div> 
   );
 };
 

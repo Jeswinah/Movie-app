@@ -17,7 +17,7 @@ const Login = ({ setAuthentication }) => {
       return;
     }
     console.log('Login attempt:', { username, password });
-    axios.post('http://localhost:5000/login', { username, password })
+    axios.post('https://movie-backend-kr04.onrender.com/login', { username, password })
       .then(response => {
         const Auth = response.data.message;
         if(Auth==='ok'){

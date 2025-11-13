@@ -22,6 +22,9 @@ const Login = ({ setAuthentication }) => {
         const Auth = response.data.message;
         if(Auth==='ok'){
         setAuthentication(true);
+        // Store credentials in localStorage
+        localStorage.setItem('username', username);
+        localStorage.setItem('isAuthenticated', 'true');
         navigate('/');}
         else{
           setAuthentication (false);

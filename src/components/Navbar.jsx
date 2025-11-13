@@ -104,6 +104,8 @@ const Navbar = ({ navTransparent = true ,setAuthentication}) => {
           <FaSignOutAlt  className="w-6 h-6" onClick={() => {
             setAuthentication(false);
             navigate('/login');
+            localStorage.removeItem('username');
+            localStorage.removeItem('isAuthenticated');
           }} 
           />     
         </Link>

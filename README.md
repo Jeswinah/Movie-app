@@ -29,6 +29,17 @@ A Netflix-style movie streaming app built with React, Vite, and TMDB API.
    npm run dev
    ```
 
+## Deployment on Netlify
+
+1. Push your code to GitHub
+2. Import project in Netlify
+3. Add environment variable in Netlify:
+   - Key: `VITE_TMDB_API_KEY`
+   - Value: Your TMDB API key
+4. Deploy
+
+The API routes will be automatically handled by Netlify serverless functions.
+
 ## Deployment on Vercel
 
 1. Push your code to GitHub

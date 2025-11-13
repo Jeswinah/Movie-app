@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SiThemoviedatabase } from "react-icons/si";
-import { FaHome, FaSearch } from "react-icons/fa";
+import { FaHome, FaSearch,FaStar,FaSignOutAlt  } from "react-icons/fa";
 
-// navTransparent: when true the navbar shows transparent background (for overlaying slider)
-const Navbar = ({ navTransparent = true }) => {
+const Navbar = ({ navTransparent = true ,setAuthentication}) => {
   const [searchval, setSearchval] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -99,13 +98,19 @@ const Navbar = ({ navTransparent = true }) => {
         >
           <FaSearch className="h-5" />
         </button>
+        
         <Link to="/" className="hover:text-blue-600 ml-2">
-          <FaHome className="w-6 h-6" />
+          {/* <FaHome className="w-6 h-6" /> */}
+          <FaSignOutAlt  className="w-6 h-6" onClick={() => {
+            setAuthentication(false);
+            navigate('/login');
+          }} 
+          />     
         </Link>
 
         {/* Suggestions dropdown */}
         {showSuggestions && (
-          <div className="absolute left-0  top-0 mt-14 w-full max-w-lg suggestion-card rounded-md overflow-hidden">
+          <div className="absolute left-0 top-0 mt-14 w-full max-w-lg suggestion-card rounded-md overflow-hidden">
             {loadingSuggest && <div className="p-3 text-sm text-muted">Loading...</div>}
             {!loadingSuggest && suggestions.map((s) => (
               <div
@@ -126,6 +131,7 @@ const Navbar = ({ navTransparent = true }) => {
                   <div className="text-sm font-semibold">{s.title}</div>
                   <div className="text-xs text-muted">{s.release_date}</div>
                 </div>
+                <div className="text-sm absolute right-2 pt-2"><FaStar className="inline mr-1 text-yellow-400" />{s.vote_average.toFixed(1)}</div>
               </div>
             ))}
             {!loadingSuggest && suggestions.length === 0 && (

@@ -9,7 +9,6 @@ const SearchPage = ({ setNavbarTransparent }) => {
   const query = new URLSearchParams(useLocation().search).get("query") || "";
 
   useEffect(() => {
-    // Set navbar to transparent when component mounts
     if (setNavbarTransparent) {
       setNavbarTransparent(true);
     }

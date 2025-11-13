@@ -8,12 +8,12 @@ const Home = ({ setNavbarTransparent }) => {
 
   async function apihandler() {
     try {
-      const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-      const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`;
-      const response = await axios.get(url);
+      const response = await axios.get("http://localhost:5000/api/movies");
+      console.log("Fetched movies:", response.data.results);
       setMovies(response.data.results || []);
     } catch (error) {
       console.error("Error fetching movies:", error);
+      setMovies([]);
     } finally {
       setLoading(false);
     }
@@ -30,7 +30,7 @@ const Home = ({ setNavbarTransparent }) => {
     vote_average: "-",
   }));
 
-  const displayData = loading ? placeholderData : movies;
+  const displayData = loading ? placeholderData : (movies || []);
 
   return (
     <div className="grid place-content-center">

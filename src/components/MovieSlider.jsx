@@ -14,19 +14,19 @@ const MovieSlider = ({ movies, setNavbarTransparent }) => {
     return () => clearInterval(interval);
   }, [movies]);
 
-  // reset when movie list changes
+
   useEffect(() => {
     setCurrent(0);
   }, [movies]);
 
-  // Observe whether slider is visible in viewport; when visible make navbar transparent
+
   useEffect(() => {
     if (!rootRef.current || typeof setNavbarTransparent !== "function") return;
     const node = rootRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // If more than 20% of the slider is visible, treat it as visible
+        
           if (entry.intersectionRatio > 0.2) {
             setNavbarTransparent(true);
           } else {

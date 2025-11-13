@@ -43,9 +43,8 @@ const Navbar = ({ navTransparent = true ,setAuthentication}) => {
     debounceRef.current = setTimeout(async () => {
       try {
         setLoadingSuggest(true);
-        const apiKey = import.meta.env.VITE_TMDB_API_KEY;
         const res = await fetch(
-          `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(q)}&page=1`
+          `https://movie-backend-kr04.onrender.com/api/movie?query=${encodeURIComponent(q)}`
         );
         const data = await res.json();
         const results = (data.results || []).filter((it) => it.poster_path || it.backdrop_path).slice(0, 6);

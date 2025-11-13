@@ -1,12 +1,50 @@
-# React + Vite
+# Movie App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Netflix-style movie streaming app built with React, Vite, and TMDB API.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🎬 Browse popular movies
+- 🔍 Search for movies with live suggestions
+- 📱 Responsive Netflix-style UI
+- ▶️ Stream movies in fullscreen
+- 🎨 Beautiful animations and transitions
 
-## Expanding the ESLint configuration
+## Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file in the root directory:
+   ```
+   VITE_TMDB_API_KEY=your_tmdb_api_key_here
+   ```
+   Get your API key from [TMDB](https://www.themoviedb.org/settings/api)
+
+4. Run development server:
+   ```bash
+   npm run dev
+   ```
+
+## Deployment on Vercel
+
+1. Push your code to GitHub
+2. Import project in Vercel
+3. Add environment variable:
+   - Key: `VITE_TMDB_API_KEY`
+   - Value: Your TMDB API key
+4. Deploy
+
+The API routes will be automatically handled by Vercel serverless functions.
+
+## Tech Stack
+
+- React 19
+- Vite
+- Tailwind CSS
+- React Router
+- TMDB API
+- Vercel (Deployment)

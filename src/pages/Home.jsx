@@ -9,9 +9,7 @@ const Home = ({ setNavbarTransparent }) => {
   async function apihandler() {
     try {
       const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-      const url = import.meta.env.DEV 
-        ? `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`
-        : '/api/tmdb/movie/popular';
+      const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`;
       const response = await axios.get(url);
       setMovies(response.data.results || []);
     } catch (error) {

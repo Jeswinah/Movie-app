@@ -23,10 +23,7 @@ const SearchPage = ({ setNavbarTransparent }) => {
       setError(null);
       try {
         const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-        const url = import.meta.env.DEV
-          ? `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}`
-          : `/api/tmdb/search/movie?query=${encodeURIComponent(query)}`;
-        const res = await fetch(url);
+        const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}`);
         if (!res.ok) {
           throw new Error("Failed to fetch movies");
         }

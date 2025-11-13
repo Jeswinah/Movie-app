@@ -45,10 +45,9 @@ const Navbar = ({ navTransparent = true }) => {
       try {
         setLoadingSuggest(true);
         const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-        const url = import.meta.env.DEV
-          ? `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(q)}&page=1`
-          : `/api/tmdb/search/movie?query=${encodeURIComponent(q)}&page=1`;
-        const res = await fetch(url);
+        const res = await fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(q)}&page=1`
+        );
         const data = await res.json();
         const results = (data.results || []).filter((it) => it.poster_path || it.backdrop_path).slice(0, 6);
         setSuggestions(results);

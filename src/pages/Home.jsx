@@ -9,16 +9,9 @@ const Home = ({ setNavbarTransparent }) => {
   async function apihandler() {
     try {
       const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-      let url;
-      if (import.meta.env.DEV) {
-        url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`;
-      } else {
-        // production uses server proxy
-        url = `/api/tmdb/movie/popular`;
-      }
+      const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`;
       const response = await axios.get(url);
-      // if proxied, the response shape may be the same
-      setMovies(response.data.results || response.data.results || []);
+      setMovies(response.data.results || []);
     } catch (error) {
       console.error("Error fetching movies:", error);
     } finally {

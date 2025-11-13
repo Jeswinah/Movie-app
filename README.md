@@ -38,8 +38,6 @@ A Netflix-style movie streaming app built with React, Vite, and TMDB API.
    - Value: Your TMDB API key
 4. Deploy
 
-The API routes will be automatically handled by Netlify serverless functions.
-
 ## Deployment on Vercel
 
 1. Push your code to GitHub
@@ -49,7 +47,7 @@ The API routes will be automatically handled by Netlify serverless functions.
    - Value: Your TMDB API key
 4. Deploy
 
-The API routes will be automatically handled by Vercel serverless functions.
+**Note:** The app directly calls TMDB API from the client side using your API key stored in environment variables.
 
 ## Tech Stack
 

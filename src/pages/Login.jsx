@@ -9,6 +9,14 @@ const Login = ({ setAuthentication }) => {
     const [errorMsg, setErrorMsg] = useState("");
     const img="https://image.tmdb.org/t/p/original/1RgPyOhN4DRs225BGTlHJqCudII.jpg"
     
+  useEffect(() => {
+    const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+    if (isAuth) {
+      setAuthentication(true);
+      navigate('/');
+    }
+  }, [navigate, setAuthentication]);
+    
   const handleSubmit = (e) => {
     e.preventDefault()
     if(username =="" || password ==""){

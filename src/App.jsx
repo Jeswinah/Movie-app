@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -10,8 +10,15 @@ import Login from "./pages/Login";
 
 function App() {
   const [navTransparent, setNavTransparent] = useState(true);
-  const [authentication, setAuthentication] = useState(false);
+  const [authentication, setAuthentication] = useState(() => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
   const location = useLocation();
+
+  useEffect(() => {
+    const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+    setAuthentication(isAuth);
+  }, []);
 
   const isMoviePage = location.pathname.startsWith('/movie/');
 

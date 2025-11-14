@@ -7,7 +7,7 @@ const MovieDetails = () => {
   return (
     <div className="fixed inset-0 w-full h-screen bg-black">
       <iframe
-        src={`https://www.2embed.cc/embed/${id}`}
+        src={`https://player.videasy.net/movie/${id}`}
         frameBorder="0"
         allowFullScreen
         title="Movie Player"

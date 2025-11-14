@@ -52,7 +52,6 @@ const Login = ({ setAuthentication }) => {
 
   return (
     <div 
-    
       className="h-screen flex flex-col items-center justify-center  px-4 overflow-hidden bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: img ? `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${img}) ` : 'none',

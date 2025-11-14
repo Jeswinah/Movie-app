@@ -7,6 +7,7 @@ import SearchPage from "./components/Searchpage";
 import MovieDetails from "./components/MovieDetail";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Loading from "./pages/Loading";
 
 function App() {
   const [navTransparent, setNavTransparent] = useState(true);
@@ -24,7 +25,7 @@ function App() {
 
   return (
     <>
-      {authentication &&  !isMoviePage && <Navbar navTransparent={navTransparent} setAuthentication={setAuthentication} />}
+      {authentication  && !isMoviePage && <Navbar navTransparent={navTransparent} setAuthentication={setAuthentication} />}
       <div className={isMoviePage || !authentication ? "" : "pt-16 p-0" }>
         <Routes>
           <Route path="/login" element={<Login setAuthentication={setAuthentication} />} />

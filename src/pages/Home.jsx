@@ -2,6 +2,7 @@ import Card from "../components/Card";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MovieSlider from "../components/MovieSlider";
+import Loading from "./Loading";
 const Home = ({ setNavbarTransparent }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +34,7 @@ const Home = ({ setNavbarTransparent }) => {
   const displayData = loading ? placeholderData : (movies || []);
 
   return (
+    loading?<Loading/>:(
     <div className="grid place-content-center">
       <MovieSlider movies={movies} setNavbarTransparent={setNavbarTransparent} />
       <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark">Popular Movies</h1>
@@ -46,7 +48,7 @@ const Home = ({ setNavbarTransparent }) => {
           );
         })}
       </div>
-    </div>
+    </div>)
   );
 };
 

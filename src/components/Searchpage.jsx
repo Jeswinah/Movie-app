@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 
-const SearchPage = ({ setNavbarTransparent }) => {
+const SearchPage = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const query = new URLSearchParams(useLocation().search).get("query") || "";
-
-  useEffect(() => {
-    if (setNavbarTransparent) {
-      setNavbarTransparent(true);
-    }
-  }, [setNavbarTransparent]);
 
   useEffect(() => {
     if (!query) return;

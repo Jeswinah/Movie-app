@@ -1,6 +1,5 @@
 import React from "react";
 import { FaGithub, FaLinkedin, FaInstagram, FaRegCopyright } from "react-icons/fa";
-import { Link } from "react-router-dom";
 
 const Footer = () => {
   const Fullyear = new Date().getFullYear();

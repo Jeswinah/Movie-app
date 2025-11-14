@@ -10,7 +10,6 @@ import Login from "./pages/Login";
 import Loading from "./pages/Loading";
 
 function App() {
-  const [navTransparent, setNavTransparent] = useState(true);
   const [authentication, setAuthentication] = useState(() => {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
@@ -25,15 +24,15 @@ function App() {
 
   return (
     <>
-      {authentication  && !isMoviePage && <Navbar navTransparent={navTransparent} setAuthentication={setAuthentication} />}
+      {authentication  && !isMoviePage && <Navbar setAuthentication={setAuthentication} />}
       <div className={isMoviePage || !authentication ? "" : "pt-16 p-0" }>
         <Routes>
           <Route path="/login" element={<Login setAuthentication={setAuthentication} />} />
           {authentication ? (
             <>
-              <Route path="/" element={<Home setNavbarTransparent={setNavTransparent} />} />
-              <Route path="/search" element={<SearchPage setNavbarTransparent={setNavTransparent} />} />
-              <Route path="/movie/:id" element={<MovieDetails setNavbarTransparent={setNavTransparent} />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/movie/:id" element={<MovieDetails />} />
             </>
           ) : (
             <Route path="*" element={<Login setAuthentication={setAuthentication} />} />

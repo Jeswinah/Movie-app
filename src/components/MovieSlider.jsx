@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
-const MovieSlider = ({ movies, setNavbarTransparent }) => {
+const MovieSlider = ({ movies }) => {
   const [current, setCurrent] = useState(0);
   const rootRef = useRef(null);
 
@@ -18,33 +18,6 @@ const MovieSlider = ({ movies, setNavbarTransparent }) => {
   useEffect(() => {
     setCurrent(0);
   }, [movies]);
-
-
-  useEffect(() => {
-    if (!rootRef.current || typeof setNavbarTransparent !== "function") return;
-    const node = rootRef.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-        
-          if (entry.intersectionRatio > 0.2) {
-            setNavbarTransparent(true);
-          } else {
-            setNavbarTransparent(false);
-          }
-        });
-      },
-      { threshold: [0, 0.2, 0.5, 0.75, 1] }
-    );
-
-    observer.observe(node);
-    // ensure navbar state is set initially
-    return () => {
-      observer.disconnect();
-      // when unmounting slider, ensure navbar is not left transparent
-      setNavbarTransparent(false);
-    };
-  }, [setNavbarTransparent]);
 
   if (!movies || movies.length === 0) return null;
 

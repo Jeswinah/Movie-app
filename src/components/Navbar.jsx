@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SiThemoviedatabase } from "react-icons/si";
-import { FaHome, FaSearch,FaStar,FaSignOutAlt  } from "react-icons/fa";
+import { FaSearch,FaStar,FaSignOutAlt  } from "react-icons/fa";
 
-const Navbar = ({ navTransparent = true ,setAuthentication}) => {
+const Navbar = ({ setAuthentication }) => {
   const [searchval, setSearchval] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -73,7 +73,7 @@ const Navbar = ({ navTransparent = true ,setAuthentication}) => {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4 lg:px-20 bg-gradient-to-b from-black/80 to-transparent">
+    <div className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4 lg:px-20 bg-gradient-to-b from-black/100 to-transparent">
       <div className="logo" onClick={() => navigate('/')}>
         <h2 className="text-lg cursor-pointer font-bold flex items-center gap-2 text-white">
           <SiThemoviedatabase className="w-10 h-10" />
@@ -98,15 +98,14 @@ const Navbar = ({ navTransparent = true ,setAuthentication}) => {
           <FaSearch className="h-5" />
         </button>
         
-        <Link to="/" className="hover:text-blue-600 ml-2">
-          {/* <FaHome className="w-6 h-6" /> */}
+        <Link to="/" className="hover:text-red-800 ml-2">
           <FaSignOutAlt  className="w-6 h-6" onClick={() => {
             setAuthentication(false);
             navigate('/login');
             localStorage.removeItem('username');
             localStorage.removeItem('isAuthenticated');
           }} 
-          />     
+          />    
         </Link>
 
         {/* Suggestions dropdown */}

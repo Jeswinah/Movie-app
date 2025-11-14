@@ -84,7 +84,7 @@ const MovieSlider = ({ movies, setNavbarTransparent }) => {
               <Link to={`/movie/${movie.id}`} className={`transition-all duration-700 delay-700 ${
                 isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}>
-                <button className="bg-red-600 text-white font-medium rounded-md w-40 h-12 shadow-lg hover:cursor-pointer hover:opacity-50 transition-all">
+                <button className="bg-red-600 text-white font-medium rounded-md w-44 h-12 shadow-lg hover:cursor-pointer hover:opacity-50 transition-all">
                   Watch Now
                 </button>
               </Link>

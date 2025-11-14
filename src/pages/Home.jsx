@@ -10,7 +10,6 @@ const Home = ({ setNavbarTransparent }) => {
   async function apihandler() {
     try {
       const response = await axios.get("https://movie-backend-kr04.onrender.com/api/movies");
-      console.log("Fetched movies:", response.data.results);
       setMovies(response.data.results || []);
     } catch (error) {
       console.error("Error fetching movies:", error);

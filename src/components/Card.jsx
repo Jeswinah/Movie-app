@@ -8,7 +8,7 @@ const Card = ({ id, title, img, vote }) => {
   return (
     <Link to={`/movie/${id}`} className="group">
       <div className="relative rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-200 cursor-pointer">
-        <img src={img} alt={title} className="w-full h-56 object-cover" />
+        <img src={img} alt={title} className="w-full h-auto aspect-[2/3] object-cover" />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 

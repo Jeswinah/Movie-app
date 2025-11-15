@@ -72,7 +72,7 @@ const Home = () => {
       {/* Tamil Comedy Movies */}
       <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Comedy</h1>
       <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8">
-        {tamilMovies.comedy.slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
+        {(tamilMovies?.comedy || []).slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
           const imgUrl = backdrop_path
             ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
             : "https://placehold.co/300x168?text=No+Image";
@@ -85,7 +85,7 @@ const Home = () => {
       {/* Tamil Romance Movies */}
       <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Romance</h1>
       <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8">
-        {tamilMovies.romance.slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
+        {(tamilMovies?.romance || []).slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
           const imgUrl = backdrop_path
             ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
             : "https://placehold.co/300x168?text=No+Image";
@@ -98,7 +98,7 @@ const Home = () => {
       {/* Tamil Crime Movies */}
       <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Crime</h1>
       <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8">
-        {tamilMovies.crime.slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
+        {(tamilMovies?.crime || []).slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
           const imgUrl = backdrop_path
             ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
             : "https://placehold.co/300x168?text=No+Image";
@@ -111,7 +111,7 @@ const Home = () => {
       {/* Tamil Thriller Movies */}
       <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Thriller</h1>
       <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8 mb-10">
-        {tamilMovies.thriller.slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
+        {(tamilMovies?.thriller || []).slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
           const imgUrl = backdrop_path
             ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
             : "https://placehold.co/300x168?text=No+Image";

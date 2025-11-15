@@ -5,7 +5,12 @@ import MovieSlider from "../components/MovieSlider";
 import Loading from "./Loading";
 const Home = () => {
   const [movies, setMovies] = useState([]);
-  const [tamilMovies, setTamilMovies] = useState([]);
+  const [tamilMovies, setTamilMovies] = useState({
+    comedy: [],
+    romance: [],
+    crime: [],
+    thriller: []
+  });
   const [loading, setLoading] = useState(true);
 
   async function apihandler() {
@@ -15,11 +20,21 @@ const Home = () => {
         axios.get("https://movie-backend-kr04.onrender.com/api/movies/tamil")
       ]);
       setMovies(popularResponse.data.results || []);
-      setTamilMovies(tamilResponse.data.results || []);
+      setTamilMovies(tamilResponse.data || {
+        comedy: [],
+        romance: [],
+        crime: [],
+        thriller: []
+      });
     } catch (error) {
       console.error("Error fetching movies:", error);
       setMovies([]);
-      setTamilMovies([]);
+      setTamilMovies({
+        comedy: [],
+        romance: [],
+        crime: [],
+        thriller: []
+      });
     } finally {
       setLoading(false);
     }
@@ -54,12 +69,52 @@ const Home = () => {
         })}
       </div>
 
-      <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Movies</h1>
-      <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8 mb-10">
-        {tamilMovies.map(({ id, title, backdrop_path, vote_average }) => {
+      {/* Tamil Comedy Movies */}
+      <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Comedy</h1>
+      <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8">
+        {tamilMovies.comedy.slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
           const imgUrl = backdrop_path
             ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
-            : "https://placehold.co/300x168?text=Loading...";
+            : "https://placehold.co/300x168?text=No+Image";
+          return (
+            <Card key={id} id={id} title={title} img={imgUrl} vote={vote_average} />
+          );
+        })}
+      </div>
+
+      {/* Tamil Romance Movies */}
+      <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Romance</h1>
+      <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8">
+        {tamilMovies.romance.slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
+          const imgUrl = backdrop_path
+            ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
+            : "https://placehold.co/300x168?text=No+Image";
+          return (
+            <Card key={id} id={id} title={title} img={imgUrl} vote={vote_average} />
+          );
+        })}
+      </div>
+
+      {/* Tamil Crime Movies */}
+      <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Crime</h1>
+      <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8">
+        {tamilMovies.crime.slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
+          const imgUrl = backdrop_path
+            ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
+            : "https://placehold.co/300x168?text=No+Image";
+          return (
+            <Card key={id} id={id} title={title} img={imgUrl} vote={vote_average} />
+          );
+        })}
+      </div>
+
+      {/* Tamil Thriller Movies */}
+      <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Thriller</h1>
+      <div className="cards grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 mx-4 sm:gap-8 sm:mx-8 mb-10">
+        {tamilMovies.thriller.slice(0, 10).map(({ id, title, backdrop_path, vote_average }) => {
+          const imgUrl = backdrop_path
+            ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
+            : "https://placehold.co/300x168?text=No+Image";
           return (
             <Card key={id} id={id} title={title} img={imgUrl} vote={vote_average} />
           );

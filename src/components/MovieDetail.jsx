@@ -96,16 +96,16 @@ const MovieDetails = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-t from-netflix-dark via-netflix-dark/80 to-transparent"></div>
 
-        <div className="relative z-10 flex flex-col justify-end h-full px-8 md:px-20 pb-20">
+        <div className="relative  z-10 flex flex-col justify-center h-full px-8 md:px-20 ">
           <div className="flex flex-col md:flex-row gap-8 bg-black/70 p-6 rounded-lg shadow-lg">
             <img
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
               alt={movie.title}
-              className="w-64 rounded-lg shadow-2xl"
+              className="w-64 rounded-lg shadow-2xl hidden md:block"
             />
 
             <div className="flex-1 text-white">
-              <h1 className="text-5xl md:text-6xl font-bold mb-4">{movie.title}</h1>
+              <h1 className=" text-5xl md:text-6xl font-bold mb-4">{movie.title}</h1>
               
               <div className="flex items-center gap-4 mb-4 text-lg">
                 <div className="flex items-center gap-2">

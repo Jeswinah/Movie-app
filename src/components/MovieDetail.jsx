@@ -63,14 +63,6 @@ const MovieDetails = () => {
     );
   }
 
-  if (!movie) {
-    return (
-      <div className="fixed inset-0 w-full h-screen bg-netflix-dark flex items-center justify-center">
-        <div className="text-white text-2xl">Movie not found</div>
-      </div>
-    );
-  }
-
   if (isPlaying) {
     return (
       <div className="fixed inset-0 w-full h-screen bg-black">
@@ -82,6 +74,14 @@ const MovieDetails = () => {
           title="Movie Player"
           className="w-full h-full"
         />
+      </div>
+    );
+  }
+
+  if (!movie) {
+    return (
+      <div className="fixed inset-0 w-full h-screen bg-netflix-dark flex items-center justify-center">
+        <div className="text-white text-2xl">Movie not found</div>
       </div>
     );
   }

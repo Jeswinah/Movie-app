@@ -12,42 +12,25 @@ const MovieDetails = () => {
   const [streamUrl, setStreamUrl] = useState(`https://player.videasy.net/movie/${id}?autoplay=1`);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const shouldAutoplay = params.get('autoplay') === 'true';
-
-    // If autoplay, skip movie details and play immediately
-    if (shouldAutoplay) {
-      setIsPlaying(true);
-      setLoading(false);
-      return;
-    }
-
     const fetchMovieDetails = async () => {
       try {
-        // Add timeout to prevent hanging on slow networks
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-
         const movieResponse = await axios.get(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`,
-          { signal: controller.signal }
+          `https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`
         );
-        
-        clearTimeout(timeoutId);
         setMovie(movieResponse.data);
         setLoading(false);
+        
+        const params = new URLSearchParams(location.search);
+        if (params.get('autoplay') === 'true') {
+          setIsPlaying(true);
+        }
 
-        // Fetch stream URL in background
         axios.get(`https://movie-backend-kr04.onrender.com/api/stream/${id}`)
           .then(response => setStreamUrl(response.data.streamUrl))
           .catch(err => console.error("Stream URL fetch failed:", err));
           
       } catch (error) {
-        if (error.name === 'AbortError' || error.code === 'ECONNABORTED') {
-          console.error("Request timeout - slow network");
-        } else {
-          console.error("Error fetching movie details:", error);
-        }
+        console.error("Error fetching movie details:", error);
         setLoading(false);
       }
     };

@@ -43,10 +43,10 @@ const Home = () => {
     <div className="grid place-content-center">
       <MovieSlider movies={tamilMovies.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)} />
 
-      <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Tamil Movies</h1>
-      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-3 mx-4 sm:gap-4 sm:mx-8 mb-10">
+      <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Trending Movies</h1>
+      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8 mb-10">
         {tamilMovies
-          .filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)
+          .filter(({ poster_path, vote_average }) => poster_path && vote_average >= 1)
           .slice(0, 42)
           .map(({ id, title, poster_path, vote_average }) => {
           const imgUrl = poster_path
@@ -58,12 +58,12 @@ const Home = () => {
         })}
       </div>
        <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark">Popular Movies</h1>
-      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-3 mx-4 sm:gap-4 sm:mx-8">
+      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8">
         {displayData
-          .filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)
-          .map(({ id, title, backdrop_path, vote_average }) => {
-          const imgUrl = backdrop_path
-            ? `https://image.tmdb.org/t/p/w500/${backdrop_path}`
+          .filter(({ poster_path, vote_average }) => poster_path && vote_average >= 1)
+          .map(({ id, title, poster_path, vote_average }) => {
+          const imgUrl = poster_path
+            ? `https://image.tmdb.org/t/p/w500/${poster_path}`
             : "https://placehold.co/300x168?text=Loading...";
           return (
             <Card key={id} id={id} title={title} img={imgUrl} vote={vote_average} />

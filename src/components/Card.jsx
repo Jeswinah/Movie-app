@@ -12,11 +12,11 @@ const Card = ({ id, title, img, vote }) => {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 
-        <div className="absolute left-3 bottom-3 right-3 flex items-end justify-between">
+        <div className="absolute left-0 bottom-0 right-0 flex items-end justify-between bg-black/40 py-1 px-2">
           <div className="text-white">
             <h3 className="text-sm font-semibold line-clamp-2">{title}</h3>
           </div>
-          <div className="bg-black/70 text-white px-2 py-1 rounded flex items-center text-sm">
+          <div className=" text-white px-2 py-1 rounded flex items-center text-sm">
             <FaStar className="text-yellow-400 mr-1" /> {result}
           </div>
         </div>

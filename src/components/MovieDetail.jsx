@@ -12,6 +12,16 @@ const MovieDetails = () => {
   const [streamUrl, setStreamUrl] = useState(`https://player.videasy.net/movie/${id}?autoplay=1`);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const shouldAutoplay = params.get('autoplay') === 'true';
+    
+    // If autoplay, skip details and go straight to player
+    if (shouldAutoplay) {
+      setIsPlaying(true);
+      setLoading(false);
+      return;
+    }
+
     const fetchMovieDetails = async () => {
       try {
         const movieResponse = await axios.get(
@@ -20,11 +30,6 @@ const MovieDetails = () => {
         );
         setMovie(movieResponse.data);
         setLoading(false);
-        
-        const params = new URLSearchParams(location.search);
-        if (params.get('autoplay') === 'true') {
-          setIsPlaying(true);
-        }
 
         axios.get(`https://movie-backend-kr04.onrender.com/api/stream/${id}`, { timeout: 5000 })
           .then(response => setStreamUrl(response.data.streamUrl))

@@ -15,8 +15,8 @@ const MovieDetails = () => {
     const fetchMovieDetails = async () => {
       try {
         const movieResponse = await axios.get(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`,
-          { timeout: 10000 }
+          `https://movie-backend-kr04.onrender.com/api/movie/${id}`,
+          { timeout: 15000 }
         );
         setMovie(movieResponse.data);
         setLoading(false);

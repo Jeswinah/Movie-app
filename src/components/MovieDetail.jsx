@@ -9,26 +9,28 @@ const MovieDetails = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [streamUrl, setStreamUrl] = useState("");
+  const [streamUrl, setStreamUrl] = useState(`https://player.videasy.net/movie/${id}?autoplay=1`);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
-        const [movieResponse, streamResponse] = await Promise.all([
-          axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`),
-          axios.get(`https://movie-backend-kr04.onrender.com/api/stream/${id}`)
-        ]);
+        const movieResponse = await axios.get(
+          `https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`
+        );
         setMovie(movieResponse.data);
-        setStreamUrl(streamResponse.data.streamUrl);
+        setLoading(false);
         
-        // Check if autoplay parameter is present
         const params = new URLSearchParams(location.search);
         if (params.get('autoplay') === 'true') {
           setIsPlaying(true);
         }
+
+        axios.get(`https://movie-backend-kr04.onrender.com/api/stream/${id}`)
+          .then(response => setStreamUrl(response.data.streamUrl))
+          .catch(err => console.error("Stream URL fetch failed:", err));
+          
       } catch (error) {
         console.error("Error fetching movie details:", error);
-      } finally {
         setLoading(false);
       }
     };

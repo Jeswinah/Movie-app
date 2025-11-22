@@ -9,14 +9,17 @@ const MovieDetails = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [streamUrl, setStreamUrl] = useState("");
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
-        const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`
-        );
-        setMovie(response.data);
+        const [movieResponse, streamResponse] = await Promise.all([
+          axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`),
+          axios.get(`https://movie-backend-kr04.onrender.com/api/stream/${id}`)
+        ]);
+        setMovie(movieResponse.data);
+        setStreamUrl(streamResponse.data.streamUrl);
         
         // Check if autoplay parameter is present
         const params = new URLSearchParams(location.search);
@@ -53,7 +56,7 @@ const MovieDetails = () => {
     return (
       <div className="fixed inset-0 w-full h-screen bg-black">
         <iframe
-          src={`https://player.videasy.net/movie/${id}?autoplay=1`}
+          src={streamUrl}
           frameBorder="0"
           allowFullScreen
           allow="autoplay; fullscreen"

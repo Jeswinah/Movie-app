@@ -133,8 +133,7 @@ const MovieDetails = () => {
                 ))}
               </div>
 
-              <p className="text-lg mb-6 max-w-3xl leading-relaxed line-clamp-7 lg:line-clamp-none">{movie.overview}</p>
-
+              <p className="text-lg mb-6 max-w-3xl leading-relaxed">{movie.overview}</p>
 
               <button
                 onClick={() => setIsPlaying(true)}

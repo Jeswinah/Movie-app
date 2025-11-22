@@ -15,7 +15,8 @@ const MovieDetails = () => {
     const fetchMovieDetails = async () => {
       try {
         const movieResponse = await axios.get(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`
+          `https://api.themoviedb.org/3/movie/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`,
+          { timeout: 10000 }
         );
         setMovie(movieResponse.data);
         setLoading(false);
@@ -25,13 +26,24 @@ const MovieDetails = () => {
           setIsPlaying(true);
         }
 
-        axios.get(`https://movie-backend-kr04.onrender.com/api/stream/${id}`)
+        axios.get(`https://movie-backend-kr04.onrender.com/api/stream/${id}`, { timeout: 5000 })
           .then(response => setStreamUrl(response.data.streamUrl))
           .catch(err => console.error("Stream URL fetch failed:", err));
           
       } catch (error) {
         console.error("Error fetching movie details:", error);
         setLoading(false);
+        setMovie({
+          id: id,
+          title: "Loading...",
+          overview: "Movie information could not be loaded. You can still watch the movie.",
+          vote_average: 0,
+          release_date: "",
+          runtime: 0,
+          genres: [],
+          backdrop_path: null,
+          poster_path: null
+        });
       }
     };
 

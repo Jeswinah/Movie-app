@@ -24,7 +24,7 @@ const Login = ({ setAuthentication }) => {
        setTimeout(() => {  setErrorMsg(""); }, 3000);
       return;
     }
-    console.log('Login attempt:', { username, password });
+    // console.log('Login attempt:', { username, password });
     axios.post('https://movie-backend-kr04.onrender.com/login', { username, password })
       .then(response => {
         const Auth = response.data.message;

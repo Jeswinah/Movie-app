@@ -21,10 +21,9 @@ const Home = () => {
       setMovies([]);
       setTamilMovies([]);
     } finally {
-      setLoading(false);
+      setInterval(() => setLoading(false), 1000);
     }
   }
-
   useEffect(() => {
     apihandler();
   }, []);
@@ -60,7 +59,8 @@ const Home = () => {
        <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark">Popular Movies</h1>
       <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8">
         {displayData
-          .filter(({ poster_path, vote_average }) => poster_path && vote_average >= 1)
+          .filter(({ poster_path, vote_average,original_language }) => poster_path && vote_average >= 1 && original_language==="en")
+          .slice(0, 42)
           .map(({ id, title, poster_path, vote_average }) => {
           const imgUrl = poster_path
             ? `https://image.tmdb.org/t/p/w500/${poster_path}`

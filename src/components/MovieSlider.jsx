@@ -19,7 +19,7 @@ const MovieSlider = ({ movies }) => {
   useEffect(() => {
     setCurrent(0);
   }, [movies]);
-  console.log(movies);
+  (movies);
   
   if (!movies || movies.length === 0) return null;
 

@@ -21,7 +21,7 @@ const Home = () => {
       setMovies([]);
       setTamilMovies([]);
     } finally {
-      setInterval(() => setLoading(false), 1000);
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -39,7 +39,7 @@ const Home = () => {
 
   return (
     loading?<Loading/>:(
-    <div className="grid place-content-center">
+    <div className="min-h-screen w-full">
       <MovieSlider movies={movies.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)} />
 
       <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Trending Movies</h1>

@@ -1,5 +1,53 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
+import { FaCircle } from "react-icons/fa";
+import axios from "axios";
+
+const SearchCard = ({ movie }) => {
+  const [streamAvailable, setStreamAvailable] = useState(null);
+
+  useEffect(() => {
+    axios.get(`https://movie-backend-kr04.onrender.com/api/check-stream/${movie.id}`, { timeout: 3000 })
+      .then(res => setStreamAvailable(res.data.available))
+      .catch(() => setStreamAvailable(true));
+  }, [movie.id]);
+
+  return (
+    <Link
+      to={`/movie/${movie.id}`}
+      className="bg-netflix-dark rounded-lg overflow-hidden shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300"
+    >
+      <div className="relative">
+        {movie.poster_path ? (
+          <img
+            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            alt={movie.title}
+            className="w-full h-72 object-cover"
+          />
+        ) : (
+          <div className="w-full h-72 bg-netflix-dark flex items-center justify-center text-muted">
+            No Image
+          </div>
+        )}
+        
+        {/* Streaming availability indicator */}
+        {streamAvailable !== null && (
+          <div className={`absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
+            streamAvailable ? 'bg-green-500' : 'bg-red-500'
+          }`}>
+            <FaCircle className="text-white text-[6px]" />
+            <span className="text-white">{streamAvailable ? 'Available' : 'N/A'}</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="p-3">
+        <h2 className="text-sm font-semibold text-white line-clamp-2">{movie.title}</h2>
+        <p className="text-xs text-muted mt-1">{movie.release_date}</p>
+      </div>
+    </Link>
+  );
+};
 
 const SearchPage = () => {
   const [movies, setMovies] = useState([]);
@@ -51,27 +99,7 @@ const SearchPage = () => {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {movies.map((movie) => (
-          <Link
-            key={movie.id}
-            to={`/movie/${movie.id}`}
-            className="bg-netflix-dark rounded-lg overflow-hidden shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300"
-          >
-            {movie.poster_path ? (
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-                className="w-full h-72 object-cover"
-              />
-            ) : (
-              <div className="w-full h-72 bg-netflix-dark flex items-center justify-center text-muted">
-                No Image
-              </div>
-            )}
-            <div className="p-3">
-              <h2 className="text-sm font-semibold text-white line-clamp-2">{movie.title}</h2>
-              <p className="text-xs text-muted mt-1">{movie.release_date}</p>
-            </div>
-          </Link>
+          <SearchCard key={movie.id} movie={movie} />
         ))}
       </div>
     </div>

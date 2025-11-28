@@ -68,9 +68,8 @@ const MovieDetails = () => {
       <div className="fixed inset-0 w-full h-screen bg-black">
         <iframe
           src={streamUrl}
-          frameBorder="0"
-          allowFullScreen
-          allow="autoplay; fullscreen"
+          frameBorder="0" 
+          allow=" fullscreen"
           title="Movie Player"
           className="w-full h-full"
         />

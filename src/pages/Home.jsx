@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MovieSlider from "../components/MovieSlider";
 import Loading from "./Loading";
-const Home = () => {
+const Home = ({loading,setLoading}) => {
   const [movies, setMovies] = useState([]);
   const [tamilMovies, setTamilMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   async function apihandler() {
     try {
@@ -14,6 +14,7 @@ const Home = () => {
         axios.get("https://movie-backend-kr04.onrender.com/api/movies"),
         axios.get("https://movie-backend-kr04.onrender.com/api/movies/tamil")
       ]);
+      
       setMovies(popularResponse.data.results || []);
       setTamilMovies(tamilResponse.data.results || []);
     } catch (error) {

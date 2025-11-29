@@ -39,7 +39,7 @@ const MovieSlider = ({ movies }) => {
             <img
               src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
               alt={movie.title}
-              className="w-full h-full object-cover object-top brightness-90"
+              className="w-full h-full object-cover object-top "
             />
 
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/80"></div>

@@ -8,7 +8,6 @@ import API_BASE_URL from "../config/api";
 const Home = ({loading,setLoading}) => {
   const [movies, setMovies] = useState([]);
   const [tamilMovies, setTamilMovies] = useState([]);
-  // const [loading, setLoading] = useState(true);
 
   async function apihandler() {
     try {

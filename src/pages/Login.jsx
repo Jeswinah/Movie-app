@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import baseurl from '../config/api'
 
 const Login = ({ setAuthentication }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-    process.env.mode===development? baseurl="http://localhost:5000":baseurl="https://movie-backend-kr04.onrender.com"
   const navigate = useNavigate();
     const [errorMsg, setErrorMsg] = useState("");
     const img="https://image.tmdb.org/t/p/original/1RgPyOhN4DRs225BGTlHJqCudII.jpg"

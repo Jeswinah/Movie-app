@@ -9,8 +9,8 @@ const Login = ({ setAuthentication }) => {
 
   const navigate = useNavigate();
     const [errorMsg, setErrorMsg] = useState("");
-    const img="https://image.tmdb.org/t/p/original/1RgPyOhN4DRs225BGTlHJqCudII.jpg"
-    
+    const img="https://image.tmdb.org/t/p/original/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg"
+    const poster="https://image.tmdb.org/t/p/w500/tZRypLd2SU3Eeqg5tD5cwkk5CdL.jpg"
   useEffect(() => {
     const isAuth = localStorage.getItem('isAuthenticated') === 'true';
     if (isAuth) {
@@ -53,16 +53,23 @@ const Login = ({ setAuthentication }) => {
 
   return (
     <div 
-      className="h-screen flex flex-col items-center justify-center  px-4 overflow-hidden bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: img ? `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${img}) ` : 'none',
-        backgroundColor: 'var(--netflix-bg)'
-      }}
-    ><div className='er bg-white bg-opacity-50 font-bold backdrop-blur rounded-lg shadow-2xl absolute top-10 '>{errorMsg && <div className='p-5'><h2><span className="text-red-500">{errorMsg}</span></h2></div>}</div>
+      className="h-screen flex flex-col items-center justify-center px-4 overflow-hidden relative"
+    >
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{backgroundImage:`url(${img})`}}
+      ></div>
+      <div className="absolute inset-0 bg-black/90"></div>
       
-      <div className="w-full max-w-md">
-        <div className="bg-black bg-opacity-50 backdrop-blur rounded-lg shadow-2xl p-8 ">
-          <h1 className="text-3xl font-semibold font-mono text-white text-center mb-8">Admin Login</h1>
+      {/* Content */}
+      <div className='er bg-white bg-opacity-50 font-bold backdrop-blur rounded-lg shadow-2xl absolute top-10 z-10'>{errorMsg && <div className='p-5'><h2><span className="text-red-500">{errorMsg}</span></h2></div>}</div>
+      
+      <div className="w-full mx-4 md:max-w-3/6 h-5/6 flex rounded-xl relative z-10 border-3 border-gray-800 shadow-2xl overflow-hidden">
+        <div className="img md:w-3/6 ">
+          <img src={poster} alt="Image" className='hidden md:block h-full bg-contain rounded-tl-2xl rounded-bl-2xl w-full opacity-80'/>
+        </div>
+        <div className="bg-black w-full md:w-3/6 rounded-tr-2xl rounded-br-2xl shadow-2xl p-8 flex flex-col justify-evenly">
+          <h1 className="text-4xl font-semibold  text-white text-center mb-8">Welcome Back</h1>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>

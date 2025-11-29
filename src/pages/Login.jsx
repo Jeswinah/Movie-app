@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom'
 const Login = ({ setAuthentication }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+    process.env.mode===development? baseurl="http://localhost:5000":baseurl="https://movie-backend-kr04.onrender.com"
   const navigate = useNavigate();
     const [errorMsg, setErrorMsg] = useState("");
     const img="https://image.tmdb.org/t/p/original/1RgPyOhN4DRs225BGTlHJqCudII.jpg"
@@ -24,13 +26,12 @@ const Login = ({ setAuthentication }) => {
        setTimeout(() => {  setErrorMsg(""); }, 3000);
       return;
     }
-    // console.log('Login attempt:', { username, password });
-    axios.post('https://movie-backend-kr04.onrender.com/login', { username, password })
+
+    axios.post(`${baseurl}/login`, { username, password })
       .then(response => {
         const Auth = response.data.message;
         if(Auth==='ok'){
         setAuthentication(true);
-        // Store credentials in localStorage
         localStorage.setItem('username', username);
         localStorage.setItem('isAuthenticated', 'true');
         navigate('/');}

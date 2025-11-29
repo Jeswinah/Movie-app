@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SiThemoviedatabase } from "react-icons/si";
 import { FaSearch,FaStar,FaSignOutAlt  } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
 
 const Navbar = ({ setAuthentication }) => {
   const [searchval, setSearchval] = useState("");
@@ -44,7 +45,7 @@ const Navbar = ({ setAuthentication }) => {
       try {
         setLoadingSuggest(true);
         const res = await fetch(
-          `https://movie-backend-kr04.onrender.com/api/movie?query=${encodeURIComponent(q)}`
+          `${API_BASE_URL}/api/movie?query=${encodeURIComponent(q)}`
         );
         const data = await res.json();
         const results = (data.results || []).filter((it) => it.poster_path || it.backdrop_path).slice(0, 6);

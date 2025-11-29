@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MovieSlider from "../components/MovieSlider";
 import Loading from "./Loading";
+import API_BASE_URL from "../config/api";
+
 const Home = ({loading,setLoading}) => {
   const [movies, setMovies] = useState([]);
   const [tamilMovies, setTamilMovies] = useState([]);
@@ -11,8 +13,8 @@ const Home = ({loading,setLoading}) => {
   async function apihandler() {
     try {
       const [popularResponse, tamilResponse] = await Promise.all([
-        axios.get("https://movie-backend-kr04.onrender.com/api/movies"),
-        axios.get("https://movie-backend-kr04.onrender.com/api/movies/tamil")
+        axios.get(`${API_BASE_URL}/api/movies`),
+        axios.get(`${API_BASE_URL}/api/movies/tamil`)
       ]);
       
       setMovies(popularResponse.data.results || []);

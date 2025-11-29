@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const SearchPage = () => {
   const [movies, setMovies] = useState([]);
@@ -16,7 +17,7 @@ const SearchPage = () => {
       setError(null);
       try {
         const apiKey = import.meta.env.VITE_TMDB_API_KEY;
-        const res = await fetch(`https://movie-backend-kr04.onrender.com/api/movie?query=${encodeURIComponent(query)}`);
+        const res = await fetch(`${API_BASE_URL}/api/movie?query=${encodeURIComponent(query)}`);
         if (!res.ok) {
           throw new Error("Failed to fetch movies");
         }

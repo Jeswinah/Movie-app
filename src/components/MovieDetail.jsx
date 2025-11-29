@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FaStar, FaPlay, FaCalendar, FaClock } from "react-icons/fa";
+import API_BASE_URL from "../config/api";
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -25,13 +26,13 @@ const MovieDetails = () => {
     const fetchMovieDetails = async () => {
       try {
         const movieResponse = await axios.get(
-          `https://movie-backend-kr04.onrender.com/api/movie/${id}`,
+          `${API_BASE_URL}/api/movie/${id}`,
           { timeout: 15000 }
         );
         setMovie(movieResponse.data);
         setLoading(false);
 
-        axios.get(`https://movie-backend-kr04.onrender.com/api/stream/${id}`, { timeout: 5000 })
+        axios.get(`${API_BASE_URL}/api/stream/${id}`, { timeout: 5000 })
           .then(response => setStreamUrl(response.data.streamUrl))
           .catch(err => console.error("Stream URL fetch failed:", err));
           
@@ -68,8 +69,9 @@ const MovieDetails = () => {
       <div className="fixed inset-0 w-full h-screen bg-black">
         <iframe
           src={streamUrl}
-          frameBorder="0" 
-          allow=" fullscreen"
+          frameBorder="0"
+          allowFullScreen
+          allow="autoplay; fullscreen"
           title="Movie Player"
           className="w-full h-full"
         />

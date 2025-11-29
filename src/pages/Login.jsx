@@ -52,7 +52,7 @@ const Login = ({ setAuthentication }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-white">
+    <div className="min-h-screen flex items-center justify-center px-2 md:p-4">
       {/* Background pattern */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-600">
         <div className="absolute inset-0" style={{
@@ -72,7 +72,7 @@ const Login = ({ setAuthentication }) => {
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-5xl  bg-black/20 opacity-90 rounded-2xl shadow-2xl overflow-hidden">
         <div className="grid md:grid-cols-2">
-          <div className="side1 grid grid-cols-4 grid-rows-3 gap-0 overflow-hidden  hover:cursor-pointer" >
+          <div className=" hidden side1 md:grid grid-cols-4 grid-rows-3 gap-0 overflow-hidden  hover:cursor-pointer" >
             <img src="https://image.tmdb.org/t/p/w500/tZRypLd2SU3Eeqg5tD5cwkk5CdL.jpg" alt="Image" className='w-full h-full object-cover'/>
             <img src="https://image.tmdb.org/t/p/original/xPNDRM50a58uvv1il2GVZrtWjkZ.jpg" alt="Image" className='w-full h-full object-cover'/>
             <img src="https://image.tmdb.org/t/p/w500/semFxuYx6HcrkZzslgAkBqfJvZk.jpg" alt="Image" className='w-full h-full object-cover'/>

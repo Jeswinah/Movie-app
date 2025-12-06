@@ -88,16 +88,16 @@ const MovieDetails = () => {
   }
 
   return (
-    <div className="fixed inset-0 w-full h-screen bg-netflix-dark overflow-y-auto">
+    <div className="fixed inset-0 w-screen h-screen bg-netflix-dark overflow-y-auto">
       <div
-        className="relative w-full h-screen bg-cover bg-center"
+        className="absolute inset-0 w-full h-full bg-cover bg-center"
         style={{
           backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-netflix-dark via-netflix-dark/80 to-transparent"></div>
+        <div className="absolute inset-0 w-full h-full bg-black/20"></div>
 
-        <div className="relative  z-10 flex flex-col justify-center h-full px-8 md:px-20 ">
+        <div className="relative z-10 flex flex-col justify-center w-full h-full px-8 md:px-20">
           <div className="flex flex-col md:flex-row gap-8 bg-black/70 p-6 rounded-lg shadow-lg">
             <img
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}

@@ -71,8 +71,7 @@ const MovieDetails = () => {
           src={streamUrl}
           frameBorder="0"
           allowFullScreen
-          allow="autoplay; fullscreen; encrypted-media"
-          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation"
+          allow="autoplay; fullscreen"
           title="Movie Player"
           className="w-full h-full"
         />

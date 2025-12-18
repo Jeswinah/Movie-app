@@ -1,13 +1,15 @@
 import Card from "../components/Card";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import axios from "axios";
 import MovieSlider from "../components/MovieSlider";
 import Loading from "./Loading";
 import API_BASE_URL from "../config/api";
 
+import Snowfall from 'react-snowfall';
 const Home = ({loading,setLoading}) => {
   const [movies, setMovies] = useState([]);
   const [tamilMovies, setTamilMovies] = useState([]);
+  const [CurrDate,setCurrDate]=useState(new Date().getMonth()+1);
 
   async function apihandler() {
     try {
@@ -41,9 +43,10 @@ const Home = ({loading,setLoading}) => {
 
   return (
     loading?<Loading/>:(
-    <div className="min-h-screen w-full">
-      <MovieSlider movies={movies.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)} />
 
+    <div className="min-h-screen w-full">
+      {CurrDate ==12 ?<Snowfall  color="white"/>:null}
+      <MovieSlider movies={movies.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)} />
       <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Trending Movies</h1>
       <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8 mb-10">
         {tamilMovies

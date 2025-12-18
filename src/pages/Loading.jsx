@@ -1,7 +1,6 @@
 import React from 'react'
 import { FaArrowsSpin } from "react-icons/fa6";
 
-
 const Loading = () => {
   return (
     <div className='bg-black h-screen w-full flex-col flex justify-center items-center'>

@@ -1,5 +1,5 @@
 import Card from "../components/Card";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MovieSlider from "../components/MovieSlider";
 import Loading from "./Loading";
@@ -12,25 +12,33 @@ const Home = ({loading,setLoading}) => {
   const [CurrDate,setCurrDate]=useState(new Date().getMonth()+1);
 
   async function apihandler() {
+    const popularPromise = axios.get(`${API_BASE_URL}/api/movies`);
+    const tamilPromise = axios.get(`${API_BASE_URL}/api/movies/tamil`);
+
     try {
-      const [popularResponse, tamilResponse] = await Promise.all([
-        axios.get(`${API_BASE_URL}/api/movies`),
-        axios.get(`${API_BASE_URL}/api/movies/tamil`)
-      ]);
-      
+      const popularResponse = await popularPromise;
       setMovies(popularResponse.data.results || []);
-      setTamilMovies(tamilResponse.data.results || []);
     } catch (error) {
-      console.error("Error fetching movies:", error);
+      console.error("Error fetching popular movies:", error);
       setMovies([]);
-      setTamilMovies([]);
     } finally {
+      // Show the page once the primary feed is ready.
       setLoading(false);
     }
+
+    try {
+      const tamilResponse = await tamilPromise;
+      setTamilMovies(tamilResponse.data.results || []);
+    } catch (error) {
+      console.error("Error fetching Tamil movies:", error);
+      setTamilMovies([]);
+    }
   }
+
   useEffect(() => {
+    setLoading(true);
     apihandler();
-  }, []);
+  }, [setLoading]);
 
   const placeholderData = Array.from({ length: 10 }, (_, i) => ({
     id: `placeholder-${i}`,
@@ -44,10 +52,10 @@ const Home = ({loading,setLoading}) => {
   return (
     loading?<Loading/>:(
 
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full pb-10">
       {CurrDate ==12 ?<Snowfall  color="white"/>:null}
       <MovieSlider movies={movies.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)} />
-      <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark mt-10">Trending Movies</h1>
+      <h1 className="section-title text-5xl text-center py-5 text-white section-frame mt-10">Trending Movies</h1>
       <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8 mb-10">
         {tamilMovies
           .filter(({ poster_path, vote_average }) => poster_path && vote_average >= 1)
@@ -61,7 +69,7 @@ const Home = ({loading,setLoading}) => {
           );
         })}
       </div>
-       <h1 className="text-4xl text-center py-5 font-mono text-white bg-netflix-dark">Popular Movies</h1>
+      <h1 className="section-title text-5xl text-center py-5 text-white section-frame">Popular Movies</h1>
       <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8">
         {displayData
           .filter(({ poster_path, vote_average,original_language }) => poster_path && vote_average >= 1 && original_language==="en")

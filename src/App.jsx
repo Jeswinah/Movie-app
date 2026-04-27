@@ -7,41 +7,73 @@ import SearchPage from "./components/Searchpage";
 import MovieDetails from "./components/MovieDetail";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import authApi from "./config/authApi";
+import Series from "./pages/Series";
 
 
 function App() {
     const [loading, setLoading] = useState(true);
 
   const [authentication, setAuthentication] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    return Boolean(localStorage.getItem('authToken'));
   });
   const location = useLocation();
 
   useEffect(() => {
-    const isAuth = localStorage.getItem('isAuthenticated') === 'true';
-    setAuthentication(isAuth);
+    let isMounted = true;
+
+    const verifySession = async () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        if (isMounted) setAuthentication(false);
+        return;
+      }
+
+      try {
+        await authApi.get("/profile");
+        if (isMounted) setAuthentication(true);
+      } catch (error) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("isAuthenticated");
+        if (isMounted) setAuthentication(false);
+      }
+    };
+
+    verifySession();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const isMoviePage = location.pathname.startsWith('/movie/');
+  const isDetailPage =
+    location.pathname.startsWith('/movie/') ||
+    location.pathname.startsWith('/series/');
 
   return (
     <>
-      {authentication  && !isMoviePage && !loading && <Navbar setAuthentication={setAuthentication} />}
-      <div className={isMoviePage || !authentication  || loading? "" : "pt-16 p-0" }>
+      {authentication  && !isDetailPage && !loading && <Navbar setAuthentication={setAuthentication} />}
+      <div className={isDetailPage || !authentication  || loading? "" : "pt-16 p-0" }>
         <Routes>
-          <Route path="/login" element={<Login setAuthentication={setAuthentication} />} />
+          <Route path="/login" element={<Login setAuthentication={setAuthentication} setLoading={setLoading} />} />
+          <Route path="/signup" element={<Signup setAuthentication={setAuthentication} setLoading={setLoading} />} />
           {authentication ? (
             <>
               <Route path="/" element={<Home loading={loading} setLoading={setLoading} />} />
+              <Route path="/series" element={<Series />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/movie/:id" element={<MovieDetails />} />
+              <Route path="/series/:id" element={<MovieDetails />} />
             </>
           ) : (
-            <Route path="*" element={<Login setAuthentication={setAuthentication} />} />
+            <Route path="*" element={<Login setAuthentication={setAuthentication} setLoading={setLoading} />} />
           )}
         </Routes>
       </div>
-      {authentication &&  !isMoviePage && !loading &&  <Footer />}
+      {authentication &&  !isDetailPage && !loading &&  <Footer />}
     </>
   );
 }

@@ -3,7 +3,7 @@ import { useLocation, Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 
 const SearchPage = () => {
-  const [movies, setMovies] = useState([]);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -12,17 +12,16 @@ const SearchPage = () => {
   useEffect(() => {
     if (!query) return;
 
-    const fetchMovies = async () => {
+    const fetchResults = async () => {
       setLoading(true);
       setError(null);
       try {
-        const apiKey = import.meta.env.VITE_TMDB_API_KEY;
         const res = await fetch(`${API_BASE_URL}/api/movie?query=${encodeURIComponent(query)}`);
         if (!res.ok) {
-          throw new Error("Failed to fetch movies");
+          throw new Error("Failed to fetch results");
         }
         const data = await res.json();
-        setMovies(data.results || []);
+        setResults(data.results || []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -30,7 +29,7 @@ const SearchPage = () => {
       }
     };
 
-    fetchMovies();
+    fetchResults();
   }, [query]);
 
   if (!query) {
@@ -46,21 +45,21 @@ const SearchPage = () => {
       {loading && <p className="text-muted">Loading...</p>}
       {error && <p className="netflix-accent">{error}</p>}
 
-      {!loading && !error && movies.length === 0 && (
+      {!loading && !error && results.length === 0 && (
         <p className="text-muted">No results found for "{query}".</p>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {movies.map((movie) => (
+        {results.map((item) => (
           <Link
-            key={movie.id}
-            to={`/movie/${movie.id}`}
+            key={`${item.media_type || "movie"}-${item.id}`}
+            to={item.media_type === "tv" ? `/series/${item.id}` : `/movie/${item.id}`}
             className="bg-netflix-dark rounded-lg overflow-hidden shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300"
           >
-            {movie.poster_path ? (
+            {item.poster_path ? (
               <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
+                src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                alt={item.title || item.name}
                 className="w-full h-72 object-cover"
               />
             ) : (
@@ -69,8 +68,8 @@ const SearchPage = () => {
               </div>
             )}
             <div className="p-3">
-              <h2 className="text-sm font-semibold text-white line-clamp-2">{movie.title}</h2>
-              <p className="text-xs text-muted mt-1">{movie.release_date}</p>
+              <h2 className="text-sm font-semibold text-white line-clamp-2">{item.title || item.name}</h2>
+              <p className="text-xs text-muted mt-1">{item.release_date || item.first_air_date}</p>
             </div>
           </Link>
         ))}

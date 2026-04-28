@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaStar } from "react-icons/fa";
+import { tmdbImageUrl } from "../config/tmdbImage";
 
 const MovieSlider = ({ movies, mediaType = "movie" }) => {
   const [current, setCurrent] = useState(0);
@@ -36,9 +37,12 @@ const MovieSlider = ({ movies, mediaType = "movie" }) => {
             aria-hidden={!isActive}
           >
             <img
-              src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+              src={tmdbImageUrl(movie.backdrop_path, "w1280")}
               alt={movie.title || movie.name}
               className="w-full h-full object-cover object-top "
+              loading={isActive ? "eager" : "lazy"}
+              decoding="async"
+              fetchPriority={isActive ? "high" : "low"}
             />
 
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/80"></div>

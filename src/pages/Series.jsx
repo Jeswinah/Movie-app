@@ -4,6 +4,7 @@ import Card from "../components/Card";
 import MovieSlider from "../components/MovieSlider";
 import API_BASE_URL from "../config/api";
 import Loading from "./Loading";
+import { tmdbImageUrl } from "../config/tmdbImage";
 
 const Series = () => {
   const [series, setSeries] = useState([]);
@@ -41,7 +42,7 @@ const Series = () => {
           .filter(({ poster_path, vote_average }) => poster_path && vote_average >= 1)
           .slice(0, 42)
           .map(({ id, name, poster_path, vote_average }) => {
-            const imgUrl = `https://image.tmdb.org/t/p/w500/${poster_path}`;
+            const imgUrl = tmdbImageUrl(poster_path, "w342");
             return <Card key={id} id={id} title={name} img={imgUrl} vote={vote_average} mediaType="tv" />;
           })}
       </div>

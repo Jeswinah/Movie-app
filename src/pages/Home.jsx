@@ -4,6 +4,7 @@ import axios from "axios";
 import MovieSlider from "../components/MovieSlider";
 import Loading from "./Loading";
 import API_BASE_URL from "../config/api";
+import { tmdbImageUrl } from "../config/tmdbImage";
 
 import Snowfall from 'react-snowfall';
 const Home = ({loading,setLoading}) => {
@@ -62,7 +63,7 @@ const Home = ({loading,setLoading}) => {
           .slice(0, 42)
           .map(({ id, title, poster_path, vote_average }) => {
           const imgUrl = poster_path
-            ? `https://image.tmdb.org/t/p/w500/${poster_path}`
+            ? tmdbImageUrl(poster_path, "w342")
             : "https://placehold.co/300x168?text=Loading...";
           return (
             <Card key={id} id={id} title={title} img={imgUrl} vote={vote_average} />
@@ -76,7 +77,7 @@ const Home = ({loading,setLoading}) => {
           .slice(0, 42)
           .map(({ id, title, poster_path, vote_average }) => {
           const imgUrl = poster_path
-            ? `https://image.tmdb.org/t/p/w500/${poster_path}`
+            ? tmdbImageUrl(poster_path, "w342")
             : "https://placehold.co/300x168?text=Loading...";
           return (
             <Card key={id} id={id} title={title} img={imgUrl} vote={vote_average} />

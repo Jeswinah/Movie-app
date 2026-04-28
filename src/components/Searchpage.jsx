@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
+import { tmdbImageUrl } from "../config/tmdbImage";
 
 const SearchPage = () => {
   const [results, setResults] = useState([]);
@@ -58,9 +59,11 @@ const SearchPage = () => {
           >
             {item.poster_path ? (
               <img
-                src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                src={tmdbImageUrl(item.poster_path, "w185")}
                 alt={item.title || item.name}
                 className="w-full h-72 object-cover"
+                loading="lazy"
+                decoding="async"
               />
             ) : (
               <div className="w-full h-72 bg-netflix-dark flex items-center justify-center text-muted">

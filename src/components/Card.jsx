@@ -9,7 +9,7 @@ const Card = ({ id, title, img, vote, mediaType = "movie" }) => {
   return (
     <Link to={detailsPath} className="group">
       <div className="relative rounded-xl overflow-hidden shadow-[0_10px_28px_rgba(0,0,0,0.45)] border border-white/10 group-hover:border-red-400/60 group-hover:scale-[1.03] group-hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
-        <img src={img} alt={title} className="w-full h-auto aspect-[2/3] object-cover" />
+        <img src={img} alt={title} className="w-full h-auto aspect-[2/3] object-cover" loading="lazy" decoding="async" />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent"></div>
 

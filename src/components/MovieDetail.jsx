@@ -3,6 +3,7 @@ import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { FaStar, FaPlay, FaCalendar, FaClock } from "react-icons/fa";
 import API_BASE_URL from "../config/api";
+import { tmdbImageUrl } from "../config/tmdbImage";
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -132,7 +133,7 @@ const MovieDetails = () => {
       <div
         className="absolute inset-0 w-full h-full bg-cover bg-center"
         style={{
-          backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
+          backgroundImage: `url(${tmdbImageUrl(movie.backdrop_path, "w1280")})`,
         }}
       >
         <div className="absolute inset-0 w-full h-full bg-black/20"></div>
@@ -140,9 +141,11 @@ const MovieDetails = () => {
         <div className="relative z-10 flex flex-col justify-center w-full h-full px-8 md:px-20">
           <div className="flex flex-col md:flex-row gap-8 bg-black/70 p-6 rounded-lg shadow-lg">
             <img
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+              src={tmdbImageUrl(movie.poster_path, "w342")}
               alt={movie.title || movie.name}
               className="w-64 rounded-lg shadow-2xl hidden md:block"
+              loading="eager"
+              decoding="async"
             />
 
             <div className="flex-1 text-white">

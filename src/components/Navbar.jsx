@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SiThemoviedatabase } from "react-icons/si";
 import { FaSearch,FaStar,FaSignOutAlt  } from "react-icons/fa";
 import API_BASE_URL from "../config/api";
+import { tmdbImageUrl } from "../config/tmdbImage";
 
 const Navbar = ({ setAuthentication }) => {
   const [searchval, setSearchval] = useState("");
@@ -180,9 +181,11 @@ const Navbar = ({ setAuthentication }) => {
                 className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 cursor-pointer"
               >
                 <img
-                  src={`https://image.tmdb.org/t/p/w92${s.poster_path || s.backdrop_path}`}
+                  src={tmdbImageUrl(s.poster_path || s.backdrop_path, "w92")}
                   alt={s.title || s.name}
                   className="w-12 h-18 object-cover rounded-sm"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div>
                   <div className="text-sm font-semibold">{s.title || s.name}</div>

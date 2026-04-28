@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
 import baseurl from '../config/api'
+import { tmdbImageUrl } from '../config/tmdbImage'
 
 const Login = ({ setAuthentication, setLoading }) => {
   const [email, setEmail] = useState('');
@@ -9,8 +10,6 @@ const Login = ({ setAuthentication, setLoading }) => {
 
   const navigate = useNavigate();
     const [errorMsg, setErrorMsg] = useState("");
-    const img="https://image.tmdb.org/t/p/original/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg"
-    const poster="https://image.tmdb.org/t/p/w500/tZRypLd2SU3Eeqg5tD5cwkk5CdL.jpg"
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -69,18 +68,18 @@ const Login = ({ setAuthentication, setLoading }) => {
       <div className="relative z-10 w-full max-w-5xl rounded-2xl sm:rounded-3xl overflow-hidden border border-white/15 shadow-[0_24px_70px_rgba(0,0,0,0.5)]">
         <div className="grid md:grid-cols-2 bg-black/35 backdrop-blur-md">
           <div className="hidden md:grid grid-cols-4 grid-rows-3 gap-0 overflow-hidden">
-            <img src="https://image.tmdb.org/t/p/w500/tZRypLd2SU3Eeqg5tD5cwkk5CdL.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/original/xPNDRM50a58uvv1il2GVZrtWjkZ.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/w500/semFxuYx6HcrkZzslgAkBqfJvZk.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/w500/g4JtvGlQO7DByTI6frUobqvSL3R.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/original/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/w500/cm8TNGBGG0aBfWj0LgrESHv8tir.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/w500/wYf4Eq3c4iOa856tEwh3GHruHZW.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/w500/qVdrYN8qu7xUtsdEFeGiIVIaYd.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/w500/3V4kLQg0kSqPLctI5ziYWabAZYF.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/w500/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/w500/zGLHX92Gk96O1DJvLil7ObJTbaL.jpg" alt="Image" className='w-full h-full object-cover'/>
-            <img src="https://image.tmdb.org/t/p/w500/kKgQzkUCnQmeTPkyIwHly2t6ZFI.jpg" alt="Image" className='w-full h-full object-cover'/>
+            <img src={tmdbImageUrl("/tZRypLd2SU3Eeqg5tD5cwkk5CdL.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/xPNDRM50a58uvv1il2GVZrtWjkZ.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/semFxuYx6HcrkZzslgAkBqfJvZk.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/g4JtvGlQO7DByTI6frUobqvSL3R.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/cm8TNGBGG0aBfWj0LgrESHv8tir.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/wYf4Eq3c4iOa856tEwh3GHruHZW.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/qVdrYN8qu7xUtsdEFeGiIVIaYd.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/3V4kLQg0kSqPLctI5ziYWabAZYF.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/zGLHX92Gk96O1DJvLil7ObJTbaL.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
+            <img src={tmdbImageUrl("/kKgQzkUCnQmeTPkyIwHly2t6ZFI.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
           </div>
 
           <div className="p-6 sm:p-8 md:p-10 lg:p-12 bg-[#0f141a]/88 flex flex-col justify-center">

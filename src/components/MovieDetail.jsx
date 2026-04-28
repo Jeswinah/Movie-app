@@ -191,7 +191,7 @@ const MovieDetails = () => {
                         setEpisode(1);
                         updateStreamUrl(`/api/series/stream/${id}`, selectedSeason, 1);
                       }}
-                      className="bg-black/70 border border-white/30 rounded px-3 py-2"
+                      className="bg-black/70 border border-white/30 rounded-lg px-3 py-2"
                     >
                       {availableSeasons.map((s) => (
                         <option key={s.id || s.season_number} value={s.season_number}>
@@ -210,7 +210,7 @@ const MovieDetails = () => {
                         setEpisode(selectedEpisode);
                         updateStreamUrl(`/api/series/stream/${id}`, season, selectedEpisode);
                       }}
-                      className="bg-black/70 border border-white/30 rounded px-3 py-2"
+                      className="bg-black/70 border border-white/30 rounded-lg px-3 py-2"
                     >
                       {Array.from(
                         {

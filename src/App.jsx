@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import authApi from "./config/authApi";
 import Series from "./pages/Series";
+import ChatbotWidget from "./components/ChatbotWidget";
 
 
 function App() {
@@ -74,6 +75,7 @@ function App() {
         </Routes>
       </div>
       {authentication &&  !isDetailPage && !loading &&  <Footer />}
+      {authentication && !isDetailPage && !loading && <ChatbotWidget />}
     </>
   );
 }

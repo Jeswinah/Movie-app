@@ -24,23 +24,69 @@ const extractReply = (data) => {
   return "";
 };
 
-const sendChatRequest = async (message) => {
-  const response = await fetch(`${CHATBOT_API_BASE}/api/chat`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ message }),
-  });
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  if (!response.ok) {
-    throw new Error(`Chatbot request failed (${response.status})`);
+const makeId = (prefix) => {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `${prefix}-${crypto.randomUUID()}`;
+  }
+  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
+
+const sendChatRequest = async (message) => {
+  const payload = { message, prompt: message };
+  const retryStatuses = new Set([502, 503, 504]);
+  const maxAttempts = 3;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+    try {
+      const response = await fetch(`${CHATBOT_API_BASE}/api/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error("QUOTA_EXCEEDED");
+        }
+        if (retryStatuses.has(response.status) && attempt < maxAttempts) {
+          await sleep(600 * attempt);
+          continue;
+        }
+        throw new Error(`Chatbot request failed (${response.status})`);
+      }
+
+      const contentType = response.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await response.json().catch(() => null)
+        : await response.text().catch(() => "");
+
+      const reply = typeof data === "string" ? data : extractReply(data);
+      if (reply) return reply;
+      return "I am here. How can I help you with movies today?";
+    } catch (error) {
+      if (error?.name === "AbortError" && attempt < maxAttempts) {
+        await sleep(600 * attempt);
+        continue;
+      }
+      if (attempt < maxAttempts) {
+        await sleep(600 * attempt);
+        continue;
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
-  const data = await response.json().catch(() => null);
-  const reply = extractReply(data);
-  if (reply) return reply;
-  return "I am here. How can I help you with movies today?";
+  throw new Error("Chatbot request failed");
 };
 
 const ChatbotWidget = () => {
@@ -48,6 +94,7 @@ const ChatbotWidget = () => {
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState(null);
+  const [cooldownUntil, setCooldownUntil] = useState(0);
   const [messages, setMessages] = useState(() => [
     {
       id: "welcome",
@@ -57,7 +104,10 @@ const ChatbotWidget = () => {
   ]);
 
   const endRef = useRef(null);
-  const canSend = useMemo(() => input.trim().length > 0 && !isSending, [input, isSending]);
+  const canSend = useMemo(() => {
+    const now = Date.now();
+    return input.trim().length > 0 && !isSending && now >= cooldownUntil;
+  }, [input, isSending, cooldownUntil]);
 
   useEffect(() => {
     if (!open) return;
@@ -66,30 +116,39 @@ const ChatbotWidget = () => {
 
   const handleSend = async () => {
     const message = input.trim();
-    if (!message || isSending) return;
+    const now = Date.now();
+    if (!message || isSending || now < cooldownUntil) return;
 
     setInput("");
     setError(null);
     setIsSending(true);
     setMessages((prev) => [
       ...prev,
-      { id: `${Date.now()}-user`, role: "user", text: message },
+      { id: makeId("user"), role: "user", text: message },
     ]);
 
     try {
       const reply = await sendChatRequest(message);
       setMessages((prev) => [
         ...prev,
-        { id: `${Date.now()}-bot`, role: "bot", text: reply },
+        { id: makeId("bot"), role: "bot", text: reply },
       ]);
     } catch (err) {
-      setError("Unable to reach the chatbot right now.");
+      if (err?.message === "QUOTA_EXCEEDED") {
+        setCooldownUntil(Date.now() + 2 * 60 * 1000);
+        setError("Daily quota reached. Please try again later.");
+      } else {
+        setError("Unable to reach the chatbot right now.");
+      }
       setMessages((prev) => [
         ...prev,
         {
-          id: `${Date.now()}-bot-error`,
+          id: makeId("bot-error"),
           role: "bot",
-          text: "Sorry, I am having trouble connecting. Please try again soon.",
+          text:
+            err?.message === "QUOTA_EXCEEDED"
+              ? "We hit the free-tier limit. Please try again later."
+              : "Sorry, I am having trouble connecting. Please try again soon.",
         },
       ]);
     } finally {
@@ -124,9 +183,9 @@ const ChatbotWidget = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-            {messages.map((msg) => (
+            {messages.map((msg, index) => (
               <div
-                key={msg.id}
+                key={`${msg.id}-${index}`}
                 className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-md ${
                   msg.role === "user"
                     ? "ml-auto bg-red-500/90 text-white"

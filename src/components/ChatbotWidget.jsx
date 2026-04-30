@@ -166,10 +166,10 @@ const ChatbotWidget = () => {
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {open && (
-        <div className="mb-4 w-[320px] sm:w-[360px] max-h-[70vh] rounded-2xl border border-white/10 bg-black/80 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-xl flex flex-col overflow-hidden">
+        <div className="mb-4 w-[320px] sm:w-[360px] h-[70vh] rounded-2xl border border-white/10 bg-black/80 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-xl flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#1a0a0a]/90 via-[#0f141a]/90 to-[#121826]/90 border-b border-white/10">
             <div>
-              <p className="text-sm uppercase tracking-[0.25em] text-red-400">Movie AI</p>
+              <p className="text-sm uppercase tracking-[0.25em] text-red-400">MovieDb AI</p>
               <p className="text-xs text-white/70">Powered by your assistant</p>
             </div>
             <button
@@ -237,7 +237,7 @@ const ChatbotWidget = () => {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="h-14 w-14 rounded-full flex items-center justify-center shadow-[0_15px_35px_rgba(229,9,20,0.4)] bg-gradient-to-tr from-red-600 via-red-500 to-amber-400 border border-white/10 hover:scale-105 transition"
+        className={`${open && 'hidden'} rounded-full flex w-10 h-10 items-center justify-center shadow-[0_15px_35px_rgba(229,9,20,0.4)] bg-gradient-to-tr from-red-600 via-red-500 to-amber-400 border border-white/10 hover:scale-105 transition`}
         aria-label="Open chatbot"
       >
         <FaComments className="text-xl text-white" />

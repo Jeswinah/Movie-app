@@ -7,30 +7,43 @@ const MovieSlider = ({ movies, mediaType = "movie" }) => {
   const [current, setCurrent] = useState(0);
   const rootRef = useRef(null);
 
+  // Deduplicate movies by ID
+  const uniqueMovies = React.useMemo(() => {
+    if (!movies) return [];
+    const seen = new Set();
+    return movies.filter(movie => {
+      if (seen.has(movie.id)) {
+        return false;
+      }
+      seen.add(movie.id);
+      return true;
+    });
+  }, [movies]);
+
   // Auto-slide every 5s
   useEffect(() => {
-    if (!movies || movies.length === 0) return;
+    if (!uniqueMovies || uniqueMovies.length === 0) return;
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % movies.length);
+      setCurrent((prev) => (prev + 1) % uniqueMovies.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [movies]);
+  }, [uniqueMovies]);
 
 
   useEffect(() => {
     setCurrent(0);
-  }, [movies]);
+  }, [uniqueMovies]);
   
-  if (!movies || movies.length === 0) return null;
+  if (!uniqueMovies || uniqueMovies.length === 0) return null;
 
   return (
     <div ref={rootRef} className="relative w-full h-[calc(100vh)] overflow-hidden -mt-16">
       {/* Slides: render all and fade between them */}
-      {movies.map((movie, idx) => {
+      {uniqueMovies.map((movie, idx) => {
         const isActive = idx === current;
         return (
           <div
-            key={movie.id}
+            key={`slider-${movie.id}`}
             className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out bg-black ${
               isActive ? "opacity-80 scale-100 z-20" : "opacity-0 scale-105 z-10"
             }`}

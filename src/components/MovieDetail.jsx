@@ -10,6 +10,7 @@ const MovieDetails = () => {
   const location = useLocation();
   const isSeries = location.pathname.startsWith("/series/");
   const [movie, setMovie] = useState(null);
+  const [cast, setCast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [season, setSeason] = useState(1);
@@ -51,12 +52,25 @@ const MovieDetails = () => {
       try {
         const detailsEndpoint = isSeries ? `/api/series/${id}` : `/api/movie/${id}`;
         const streamEndpoint = isSeries ? `/api/series/stream/${id}` : `/api/stream/${id}`;
+        const creditsEndpoint = isSeries ? `/api/series/${id}/credits` : `/api/movie/${id}/credits`;
 
         const movieResponse = await axios.get(
           `${API_BASE_URL}${detailsEndpoint}`,
           { timeout: 15000 }
         );
         setMovie(movieResponse.data);
+
+        // Fetch cast data
+        try {
+          const creditsResponse = await axios.get(
+            `${API_BASE_URL}${creditsEndpoint}`,
+            { timeout: 15000 }
+          );
+          setCast(creditsResponse.data.cast || []);
+        } catch (err) {
+          console.error("Error fetching cast:", err);
+          setCast([]);
+        }
 
         if (isSeries) {
           const seasonList = (movieResponse.data.seasons || []).filter((s) => s.season_number > 0);
@@ -129,17 +143,18 @@ const MovieDetails = () => {
   }
 
   return (
-    <div className="fixed inset-0 w-screen h-screen bg-netflix-dark overflow-y-auto">
-      <div
-        className="absolute inset-0 w-full h-full bg-cover bg-center"
+    <div className="w-screen min-h-screen bg-netflix-dark overflow-x-hidden">
+      {/* Hero Section with Backdrop */}
+      <div className="relative w-full h-screen bg-cover bg-center flex items-center"
         style={{
           backgroundImage: `url(${tmdbImageUrl(movie.backdrop_path, "w1280")})`,
+          backgroundAttachment: 'fixed'
         }}
       >
-        <div className="absolute inset-0 w-full h-full bg-black/20"></div>
+        <div className="absolute inset-0 w-full h-full bg-black/15"></div>
 
-        <div className="relative z-10 flex flex-col justify-center w-full h-full px-8 md:px-20">
-          <div className="flex flex-col md:flex-row gap-8 bg-black/70 p-6 rounded-lg shadow-lg">
+        <div className="relative z-10 flex flex-col justify-end items-left w-full h-full px-8 md:px-10 mb-10">
+          <div className="flex flex-col md:flex-row gap-8 bg-black/50 p-6 rounded-lg shadow-lg">
             <img
               src={tmdbImageUrl(movie.poster_path, "w342")}
               alt={movie.title || movie.name}
@@ -238,6 +253,34 @@ const MovieDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Cast Section - Scrollable */}
+      {cast.length > 0 && (
+        <div className="w-full py-12 px-8 md:px-20 bg-netflix-dark">
+          <h2 className="text-3xl font-bold text-white mb-6">Cast</h2>
+          <div className="grid grid-cols-7 gap-6">
+            {cast.map((actor) => (
+              <div key={actor.id} className="flex flex-col items-center hover:scale-110 transition-transform">
+                {actor.profile_path ? (
+                  <img
+                    src={tmdbImageUrl(actor.profile_path, "w185")}
+                    alt={actor.name}
+                    className="w-24 h-24 rounded-full object-cover p-1 content-center border-2 border-red-600"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-500">
+                    <span className="text-gray-400 text-xs">No Img</span>
+                  </div>
+                )}
+                <p className="text-white font-semibold text-sm mt-2 text-center w-20 truncate">{actor.name}</p>
+                <p className="text-gray-400 text-xs text-center w-20 truncate">{actor.character}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

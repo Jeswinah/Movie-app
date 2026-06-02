@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { IoEye, IoEyeOff } from "react-icons/io5";
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
 import baseurl from '../config/api'
@@ -7,6 +8,7 @@ import { tmdbImageUrl } from '../config/tmdbImage'
 const Login = ({ setAuthentication, setLoading }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
     const [errorMsg, setErrorMsg] = useState("");
@@ -103,13 +105,22 @@ const Login = ({ setAuthentication, setLoading }) => {
 
               <div>
                 <label className="block text-sm font-semibold text-white/80 mb-2">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-white/20 rounded-xl bg-white/10 text-white placeholder-white/45 focus:outline-none focus:border-red-400 focus:bg-white/15 transition-colors"
-                  placeholder="Enter your password"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl bg-white/10 text-white placeholder-white/45 focus:outline-none focus:border-red-400 focus:bg-white/15 transition-colors"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-white/45 hover:text-white"
+                  >
+                    {showPassword ? <IoEyeOff /> : <IoEye />}
+                  </button>
+                </div>
               </div>
 
               <button

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 import { tmdbImageUrl } from "../config/tmdbImage";
+import Card from "./Card";
 
 const SearchPage = () => {
   const [results, setResults] = useState([]);
@@ -52,29 +53,14 @@ const SearchPage = () => {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {results.map((item) => (
-          <Link
+          <Card
             key={`${item.media_type || "movie"}-${item.id}`}
-            to={item.media_type === "tv" ? `/series/${item.id}` : `/movie/${item.id}`}
-            className="bg-netflix-dark rounded-lg overflow-hidden shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-300"
-          >
-            {item.poster_path ? (
-              <img
-                src={tmdbImageUrl(item.poster_path, "w185")}
-                alt={item.title || item.name}
-                className="w-full h-72 object-cover"
-                loading="lazy"
-                decoding="async"
-              />
-            ) : (
-              <div className="w-full h-72 bg-netflix-dark flex items-center justify-center text-muted">
-                No Image
-              </div>
-            )}
-            <div className="p-3">
-              <h2 className="text-sm font-semibold text-white line-clamp-2">{item.title || item.name}</h2>
-              <p className="text-xs text-muted mt-1">{item.release_date || item.first_air_date}</p>
-            </div>
-          </Link>
+            id={item.id}
+            title={item.title || item.name}
+            img={item.poster_path ? tmdbImageUrl(item.poster_path, "w185") : "https://placehold.co/300x168?text=No+Image"}
+            vote={item.vote_average}
+            mediaType={item.media_type || "movie"}
+          />
         ))}
       </div>
     </div>

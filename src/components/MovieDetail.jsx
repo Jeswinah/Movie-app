@@ -16,6 +16,7 @@ const MovieDetails = () => {
   const [season, setSeason] = useState(1);
   const [episode, setEpisode] = useState(1);
   const [availableSeasons, setAvailableSeasons] = useState([]);
+  const [providers, setProviders] = useState([]);
   const [streamUrl, setStreamUrl] = useState(
     isSeries
       ? `https://player.videasy.net/tv/${id}/1/1?nextEpisode=true&autoplayNextEpisode=true&episodeSelector=true&overlay=true&color=8B5CF6`
@@ -70,6 +71,21 @@ const MovieDetails = () => {
         } catch (err) {
           console.error("Error fetching cast:", err);
           setCast([]);
+        }
+
+        // Fetch watch providers
+        try {
+          const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+          const mediaType = isSeries ? 'tv' : 'movie';
+          const providersResponse = await axios.get(`https://api.themoviedb.org/3/${mediaType}/${id}/watch/providers?api_key=${apiKey}`);
+          const results = providersResponse.data.results;
+          const countryData = results?.IN || results?.US;
+          if (countryData?.flatrate) {
+            setProviders(countryData.flatrate);
+          }
+        } catch (err) {
+          console.error("Error fetching providers:", err);
+          setProviders([]);
         }
 
         if (isSeries) {
@@ -191,6 +207,21 @@ const MovieDetails = () => {
                   </span>
                 ))}
               </div>
+
+              {providers.length > 0 && (
+                <div className="mb-6 flex flex-wrap gap-4 items-center">
+                  <span className="text-gray-300 font-semibold text-lg">Stream on:</span>
+                  {providers.map((provider) => (
+                    <img
+                      key={provider.provider_id}
+                      src={tmdbImageUrl(provider.logo_path, "w45") || `https://image.tmdb.org/t/p/w45${provider.logo_path}`}
+                      alt={provider.provider_name}
+                      title={provider.provider_name}
+                      className="w-10 h-10 rounded-lg shadow-md border border-white/20"
+                    />
+                  ))}
+                </div>
+              )}
 
               <p className="text-lg mb-6 max-w-3xl leading-relaxed max-h-52 overflow-y-hidden">{movie.overview}</p>
 

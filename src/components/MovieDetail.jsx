@@ -287,9 +287,9 @@ const MovieDetails = () => {
 
       {/* Cast Section - Scrollable */}
       {cast.length > 0 && (
-        <div className="w-full py-12 px-8 md:px-20 bg-netflix-dark">
+        <div className="w-full py-12 px-8 md:px-20 bg-netflix1">
           <h2 className="text-3xl font-bold text-white mb-6">Cast</h2>
-          <div className="grid grid-cols-7 gap-6">
+          <div className="grid grid-cols-3 gap-6 md:grid-cols-8">
             {cast.map((actor) => (
               <div key={actor.id} className="flex flex-col items-center hover:scale-110 transition-transform">
                 {actor.profile_path ? (

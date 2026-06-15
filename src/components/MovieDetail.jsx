@@ -142,7 +142,7 @@ const MovieDetails = () => {
           src={streamUrl}
           frameBorder="0"
           allowFullScreen
-          allow="autoplay; fullscreen"
+          allow="autoplay;"
           title="Movie Player"
           className="w-full h-full"
         />

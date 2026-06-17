@@ -15,7 +15,7 @@ const Home = ({loading,setLoading}) => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [tamilPage, setTamilPage] = useState(0);
 
-  const MOVIES_PER_PAGE = 21; // 3 rows × 7 columns
+  const MOVIES_PER_PAGE = 24; // 3 rows × 7 columns
 
   const genres = [
     { label: "All", value: "all" },

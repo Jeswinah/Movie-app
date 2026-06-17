@@ -132,7 +132,7 @@ console.log(uniqueMovies.length,uniqueTamilMovies.length)
           </button>
         ))}
       </div>
-      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8 mb-10">
+      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-5 mx-4 sm:gap-4 sm:mx-8 mb-10">
         {uniqueTamilMovies
           .filter(({ poster_path, vote_average }) => poster_path && vote_average >= 1)
           .slice(0, (tamilPage + 1) * MOVIES_PER_PAGE)
@@ -160,7 +160,7 @@ console.log(uniqueMovies.length,uniqueTamilMovies.length)
         </div>
       )}
       <h1 className="section-title text-5xl text-center py-5 text-white section-frame">Popular Movies</h1>
-      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8">
+      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-5 mx-4 sm:gap-4 sm:mx-8">
         {uniqueMovies
           .filter(({ poster_path, vote_average,original_language }) => poster_path && vote_average >= 1 && original_language==="en")
           .map(({ id, title, poster_path, vote_average }) => {

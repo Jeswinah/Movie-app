@@ -16,7 +16,7 @@ const Card = ({ id, title, img, vote, mediaType = "movie" }) => {
         // Fetch service providers from the TMDB API
         const response = await axios.get(`https://api.themoviedb.org/3/${mediaType}/${id}/watch/providers?api_key=${apiKey}`);
         
-        // Results are organized by country, IN (India) or US can be prioritized
+
         const results = response.data.results;
         const countryData = results?.IN || results?.US;
         

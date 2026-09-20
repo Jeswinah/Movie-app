@@ -40,7 +40,6 @@ const Home = ({loading,setLoading}) => {
       console.error("Error fetching popular movies:", error);
       setMovies([]);
     } finally {
-      // Show the page once the primary feed is ready.
       setLoading(false);
     }
 
@@ -114,7 +113,7 @@ console.log(uniqueMovies.length,uniqueTamilMovies.length)
     loading?<Loading/>:(
 
     <div className="min-h-screen w-full pb-10">
-      {CurrDate ==12 ?<Snowfall  color="white"/>:null}
+      {CurrDate  ?<Snowfall  color="white"/>:null}
       <MovieSlider movies={uniqueTrendingTamilMovies.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)} mediaType="movie" />
       <h1 className="section-title text-5xl text-center py-5 text-white section-frame ">Trending Movies</h1>
       <div className="flex justify-center gap-2 flex-wrap m-5 px-4">

@@ -19,9 +19,22 @@ const MovieDetails = () => {
   const [providers, setProviders] = useState([]);
   const [streamUrl, setStreamUrl] = useState(
     isSeries
+      ? `https://cinesrc.st/embed/tv/${id}?s=1&e=1`
+      : `https://cinesrc.st/embed/movie/${id}`
+  );
+  const [fallbackUrl, setFallbackUrl] = useState(
+    isSeries
+      ? `https://vidsrc.sbs/embed/tv/${id}/1/1`
+      : `https://vidsrc.sbs/embed/movie/${id}`
+  );
+  const [fallbackUrl2, setFallbackUrl2] = useState(
+    isSeries
       ? `https://player.videasy.net/tv/${id}/1/1?nextEpisode=true&autoplayNextEpisode=true&episodeSelector=true&overlay=true&color=8B5CF6`
       : `https://player.videasy.net/movie/${id}?autoplay=1`
   );
+  const [useFallback, setUseFallback] = useState(false);
+  const [useFallback2, setUseFallback2] = useState(false);
+  const [iframeKey, setIframeKey] = useState(0);
 
   const updateStreamUrl = async (streamEndpoint, selectedSeason = 1, selectedEpisode = 1) => {
     try {
@@ -33,8 +46,29 @@ const MovieDetails = () => {
         }
       );
       setStreamUrl(response.data.streamUrl);
+      if (response.data.fallbackUrl) {
+        setFallbackUrl(response.data.fallbackUrl);
+      }
+      if (response.data.fallbackUrl2) {
+        setFallbackUrl2(response.data.fallbackUrl2);
+      }
+      setUseFallback(false);
+      setUseFallback2(false);
+      setIframeKey((k) => k + 1);
     } catch (err) {
       console.error("Stream URL fetch failed:", err);
+    }
+  };
+
+  const handleIframeError = () => {
+    if (!useFallback && !useFallback2 && fallbackUrl) {
+      console.warn("Primary stream (cinesrc) failed, switching to fallback (vidsrc)");
+      setUseFallback(true);
+      setIframeKey((k) => k + 1);
+    } else if (useFallback && !useFallback2 && fallbackUrl2) {
+      console.warn("Secondary stream (vidsrc) failed, switching to fallback 2 (videasy)");
+      setUseFallback2(true);
+      setIframeKey((k) => k + 1);
     }
   };
 
@@ -136,16 +170,40 @@ const MovieDetails = () => {
   }
 
   if (isPlaying) {
+    const currentServer = useFallback2 ? "Videasy" : useFallback ? "VidSrc" : "CineSrc";
+    const cycleServer = () => {
+      if (!useFallback && !useFallback2) {
+        setUseFallback(true);
+        setUseFallback2(false);
+      } else if (useFallback && !useFallback2) {
+        setUseFallback(false);
+        setUseFallback2(true);
+      } else {
+        setUseFallback(false);
+        setUseFallback2(false);
+      }
+      setIframeKey((k) => k + 1);
+    };
+
     return (
       <div className="fixed inset-0 w-full h-screen bg-black">
         <iframe
-          src={streamUrl}
+          key={iframeKey}
+          src={useFallback2 ? fallbackUrl2 : useFallback ? fallbackUrl : streamUrl}
           frameBorder="0"
           allowFullScreen
           allow="autoplay;"
           title="Movie Player"
           className="w-full h-full"
+          onError={handleIframeError}
         />
+        <button
+          onClick={cycleServer}
+          className="fixed top-5 left-1/2 -translate-x-1/2 bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-all z-50"
+          title="Switch streaming server"
+        >
+          {currentServer}
+        </button>
       </div>
     );
   }

@@ -114,7 +114,7 @@ console.log(uniqueMovies.length,uniqueTamilMovies.length)
 
     <div className="min-h-screen w-full pb-10">
       {CurrDate  ?<Snowfall  color="white"/>:null}
-      <MovieSlider movies={uniqueTrendingTamilMovies.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)} mediaType="movie" />
+      <MovieSlider movies={uniqueMovies.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)} mediaType="movie" setLoading={setLoading} />
       <h1 className="section-title text-5xl text-center py-5 text-white section-frame ">Trending Movies</h1>
       <div className="flex justify-center gap-2 flex-wrap m-5 px-4">
         {genres.map((genre) => (

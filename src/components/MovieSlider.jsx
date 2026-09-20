@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaStar } from "react-icons/fa";
 import { tmdbImageUrl } from "../config/tmdbImage";
 
-const MovieSlider = ({ movies, mediaType = "movie" }) => {
+const MovieSlider = ({ movies, mediaType = "movie" ,setLoading}) => {
   const [current, setCurrent] = useState(0);
   const rootRef = useRef(null);
 
@@ -32,6 +32,7 @@ const MovieSlider = ({ movies, mediaType = "movie" }) => {
 
   useEffect(() => {
     setCurrent(0);
+    setLoading(false); // Set loading to false when uniqueMovies changes
   }, [uniqueMovies]);
   
   if (!uniqueMovies || uniqueMovies.length === 0) return null;

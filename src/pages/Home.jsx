@@ -4,18 +4,17 @@ import axios from "axios";
 import MovieSlider from "../components/MovieSlider";
 import Loading from "./Loading";
 import API_BASE_URL from "../config/api";
+import authApi from "../config/authApi";
 import { tmdbImageUrl } from "../config/tmdbImage";
-
-import Snowfall from 'react-snowfall';
 const Home = ({loading,setLoading}) => {
   const [movies, setMovies] = useState([]);
   const [tamilMovies, setTamilMovies] = useState([]);
   const [trendingTamilMovies, setTrendingTamilMovies] = useState([]);
-  const [CurrDate,setCurrDate]=useState(new Date().getMonth()+1);
+  const [recommendations, setRecommendations] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [tamilPage, setTamilPage] = useState(0);
 
-  const MOVIES_PER_PAGE = 24; // 3 rows × 7 columns
+  const MOVIES_PER_PAGE = 28; // 4 rows × 7 columns
 
   const genres = [
     { label: "All", value: "all" },
@@ -85,6 +84,20 @@ const Home = ({loading,setLoading}) => {
     setTamilPage(0); // Reset to first page when genre changes
   }, [selectedGenre]);
 
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const response = await authApi.get("/api/recommendations");
+        setRecommendations(response.data.results || []);
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+        setRecommendations([]);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
+
   // Helper function to deduplicate movies by ID
   const deduplicateMovies = (movieList) => {
     const seen = new Set();
@@ -108,30 +121,23 @@ const Home = ({loading,setLoading}) => {
   const uniqueMovies = deduplicateMovies(displayData);
   const uniqueTamilMovies = deduplicateMovies(tamilMovies);
   const uniqueTrendingTamilMovies = deduplicateMovies(trendingTamilMovies);
+  const recommendedMovies = (() => {
+    const count = recommendations.length;
+    if (count >= 28) return recommendations.slice(0, 28);
+    if (count >= 21) return recommendations.slice(0, 21);
+    if (count >= 14) return recommendations.slice(0, 14);
+    if (count >= 7) return recommendations.slice(0, 7);
+    return recommendations;
+  })();
 console.log(uniqueMovies.length,uniqueTamilMovies.length)
   return (
     loading?<Loading/>:(
 
     <div className="min-h-screen w-full pb-10">
-      {CurrDate  ?<Snowfall  color="white"/>:null}
       <MovieSlider movies={uniqueMovies.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)} mediaType="movie" setLoading={setLoading} />
-      <h1 className="section-title text-5xl text-center py-5 text-white section-frame ">Trending Movies</h1>
-      <div className="flex justify-center gap-2 flex-wrap m-5 px-4">
-        {genres.map((genre) => (
-          <button
-            key={genre.value}
-            onClick={() => setSelectedGenre(genre.value)}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-              selectedGenre === genre.value
-                ? "bg-red-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            }`}
-          >
-            {genre.label}
-          </button>
-        ))}
-      </div>
-      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-5 mx-4 sm:gap-4 sm:mx-8 mb-10">
+      <h1 className="section-title text-5xl text-center py-5 text-slate-900 dark:text-white section-frame ">Trending Movies</h1>
+      
+      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8 mb-10">
         {uniqueTamilMovies
           .filter(({ poster_path, vote_average }) => poster_path && vote_average >= 1)
           .slice(0, (tamilPage + 1) * MOVIES_PER_PAGE)
@@ -158,10 +164,31 @@ console.log(uniqueMovies.length,uniqueTamilMovies.length)
           </button>
         </div>
       )}
-      <h1 className="section-title text-5xl text-center py-5 text-white section-frame">Popular Movies</h1>
-      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-5 mx-4 sm:gap-4 sm:mx-8">
+      {recommendedMovies.length > 0 && (
+        <>
+          <h1 className="section-title text-5xl text-center py-5 text-slate-900 dark:text-white section-frame">Recommended for You</h1>
+          <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8 mb-10">
+            {recommendedMovies.map(({ id, title, name, poster_path, vote_average, media_type }) => {
+              const imgUrl = tmdbImageUrl(poster_path, "w342");
+              return (
+                <Card
+                  key={`rec-${media_type}-${id}`}
+                  id={id}
+                  title={title || name}
+                  img={imgUrl}
+                  vote={vote_average}
+                  mediaType={media_type}
+                />
+              );
+            })}
+          </div>
+        </>
+      )}
+      <h1 className="section-title text-5xl text-center py-5 text-slate-900 dark:text-white section-frame">Popular Movies</h1>
+      <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8">
         {uniqueMovies
           .filter(({ poster_path, vote_average,original_language }) => poster_path && vote_average >= 1 && original_language==="en")
+          .slice(0, 28)
           .map(({ id, title, poster_path, vote_average }) => {
           const imgUrl = poster_path
             ? tmdbImageUrl(poster_path, "w342")

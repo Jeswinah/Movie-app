@@ -36,7 +36,7 @@ const Series = () => {
         movies={series.filter(({ backdrop_path, vote_average }) => backdrop_path && vote_average >= 1)}
         mediaType="tv"
       />
-      <h1 className="section-title text-5xl text-center py-5 text-white section-frame mt-10">Popular Series</h1>
+      <h1 className="section-title text-5xl text-center py-5 text-slate-900 dark:text-white section-frame mt-10">Popular Series</h1>
       <div className="cards grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-5 mx-4 sm:gap-4 sm:mx-8 mb-10">
         {series
           .filter(({ poster_path, vote_average }) => poster_path && vote_average >= 1)

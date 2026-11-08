@@ -57,7 +57,7 @@ const Login = ({ setAuthentication, setLoading }) => {
 
   return (
     <div className="relative max-h-screen flex items-center justify-center px-3 py-6 sm:px-5 sm:py-10">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(229,9,20,0.22),transparent_35%),radial-gradient(circle_at_85%_10%,rgba(243,191,74,0.08),transparent_30%),linear-gradient(180deg,#0b0b0b_0%,#0a1119_65%,#08090d_100%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(229,9,20,0.08),transparent_35%),radial-gradient(circle_at_85%_10%,rgba(243,191,74,0.14),transparent_30%),linear-gradient(180deg,#fcfdff_0%,#f1f5f9_65%,#e6ebf2_100%)] dark:bg-[radial-gradient(circle_at_15%_20%,rgba(229,9,20,0.22),transparent_35%),radial-gradient(circle_at_85%_10%,rgba(243,191,74,0.08),transparent_30%),linear-gradient(180deg,#0b0b0b_0%,#0a1119_65%,#08090d_100%)]"></div>
 
       {errorMsg && (
         <div className='absolute top-6 sm:top-10 left-1/2 transform -translate-x-1/2 z-50 w-[92%] sm:w-auto'>
@@ -67,8 +67,8 @@ const Login = ({ setAuthentication, setLoading }) => {
         </div>
       )}
 
-      <div className="relative z-10 w-full max-w-5xl rounded-2xl sm:rounded-3xl overflow-hidden border border-white/15 shadow-[0_24px_70px_rgba(0,0,0,0.5)]">
-        <div className="grid md:grid-cols-2 bg-black/35 backdrop-blur-md">
+      <div className="relative z-10 w-full max-w-5xl rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-[0_24px_70px_rgba(18,24,38,0.12)] dark:border-white/15 dark:shadow-[0_24px_70px_rgba(0,0,0,0.5)]">
+        <div className="grid md:grid-cols-2 bg-white/75 backdrop-blur-md dark:bg-black/35">
           <div className="hidden md:grid grid-cols-4 grid-rows-3 gap-0 overflow-hidden">
             <img src={tmdbImageUrl("/tZRypLd2SU3Eeqg5tD5cwkk5CdL.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
             <img src={tmdbImageUrl("/xPNDRM50a58uvv1il2GVZrtWjkZ.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
@@ -84,39 +84,39 @@ const Login = ({ setAuthentication, setLoading }) => {
             <img src={tmdbImageUrl("/kKgQzkUCnQmeTPkyIwHly2t6ZFI.jpg", "w342")} alt="Image" className='w-full h-full object-cover' decoding="async"/>
           </div>
 
-          <div className="p-6 sm:p-8 md:p-10 lg:p-12 bg-[#0f141a]/88 flex flex-col justify-center">
+          <div className="p-6 sm:p-8 md:p-10 lg:p-12 bg-white/90 dark:bg-[#0f141a] flex flex-col justify-center">
             <div className="mb-8 sm:mb-10">
-              <p className="display-title text-2xl tracking-wider text-[#f3bf4a]">MovieDB</p>
-              <h3 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">Welcome Back</h3>
-              <p className="text-white/70 text-sm sm:text-base">Sign in to continue your watchlist</p>
+              <p className="display-title text-2xl tracking-wider text-amber-600 dark:text-[#f3bf4a]">MovieDB</p>
+              <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Welcome Back</h3>
+              <p className="text-slate-600 dark:text-white/70 text-sm sm:text-base">Sign in to continue your watchlist</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-white/80 mb-2">Email</label>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-white/80 mb-2">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-white/20 rounded-xl bg-white/10 text-white placeholder-white/45 focus:outline-none focus:border-red-400 focus:bg-white/15 transition-colors"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-red-400 focus:bg-white transition-colors dark:border-white/20 dark:bg-white/10 dark:text-white dark:placeholder-white/45 dark:focus:bg-white/15"
                   placeholder="Enter your email"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-white/80 mb-2">Password</label>
+                <label className="block text-sm font-semibold text-slate-700 dark:text-white/80 mb-2">Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-white/20 rounded-xl bg-white/10 text-white placeholder-white/45 focus:outline-none focus:border-red-400 focus:bg-white/15 transition-colors"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-red-400 focus:bg-white transition-colors dark:border-white/20 dark:bg-white/10 dark:text-white dark:placeholder-white/45 dark:focus:bg-white/15"
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-white/45 hover:text-white"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-700 dark:text-white/45 dark:hover:text-white"
                   >
                     {showPassword ? <IoEyeOff /> : <IoEye />}
                   </button>
@@ -131,14 +131,14 @@ const Login = ({ setAuthentication, setLoading }) => {
               </button>
             </form>
 
-            <div className="mt-8 sm:mt-10 pt-6 border-t border-white/15">
-              <p className="text-center text-white/70 text-sm mb-3">
+            <div className="mt-8 sm:mt-10 pt-6 border-t border-slate-200 dark:border-white/15">
+              <p className="text-center text-slate-600 dark:text-white/70 text-sm mb-3">
                 New here?{' '}
-                <Link to="/signup" className="font-semibold text-[#f3bf4a] hover:underline">
+                <Link to="/signup" className="font-semibold text-red-600 dark:text-[#f3bf4a] hover:underline">
                   Create an account
                 </Link>
               </p>
-              <p className="text-center text-white/45 text-xs sm:text-sm">
+              <p className="text-center text-slate-400 dark:text-white/45 text-xs sm:text-sm">
                 {new Date().toDateString()}
               </p>
             </div>

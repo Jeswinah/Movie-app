@@ -67,7 +67,7 @@ const Signup = ({ setAuthentication, setLoading }) => {
 
   return (
     <div className="relative max-h-screen overflow-hidden flex items-center justify-center px-3 py-6 sm:px-5 sm:py-10">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(229,9,20,0.2),transparent_33%),radial-gradient(circle_at_80%_12%,rgba(243,191,74,0.1),transparent_34%),linear-gradient(180deg,#0b0b0b_0%,#0a1119_65%,#08090d_100%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(229,9,20,0.08),transparent_33%),radial-gradient(circle_at_80%_12%,rgba(243,191,74,0.14),transparent_34%),linear-gradient(180deg,#fcfdff_0%,#f1f5f9_65%,#e6ebf2_100%)] dark:bg-[radial-gradient(circle_at_20%_15%,rgba(229,9,20,0.2),transparent_33%),radial-gradient(circle_at_80%_12%,rgba(243,191,74,0.1),transparent_34%),linear-gradient(180deg,#0b0b0b_0%,#0a1119_65%,#08090d_100%)]"></div>
 
       {errorMsg && (
         <div className="absolute top-0 sm:top-10 left-1/2 transform -translate-x-1/2 z-50 w-[92%] sm:w-auto">
@@ -77,55 +77,55 @@ const Signup = ({ setAuthentication, setLoading }) => {
         </div>
       )}
 
-      <div className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg rounded-2xl sm:rounded-3xl overflow-hidden border   border-white/15 shadow-[0_24px_70px_rgba(0,0,0,0.5)]">
+      <div className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 bg-white/85 backdrop-blur-md shadow-[0_24px_70px_rgba(18,24,38,0.12)] dark:border-white/15 dark:bg-black/35 dark:shadow-[0_24px_70px_rgba(0,0,0,0.5)]">
         <div className="p-6 sm:p-8 md:p-10 lg:p-12">
           <div className="mb-8">
-            <p className="display-title text-2xl tracking-wider text-[#f3bf4a]">MovieDB</p>
-            <h3 className="text-3xl sm:text-4xl font-bold text-white ">Create Account</h3>
-            <p className="text-white/70">Sign up to start exploring movies</p>
+            <p className="display-title text-2xl tracking-wider text-amber-600 dark:text-[#f3bf4a]">MovieDB</p>
+            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white ">Create Account</h3>
+            <p className="text-slate-600 dark:text-white/70">Sign up to start exploring movies</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-white/80 mb-2">Name</label>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-white/80 mb-2">Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-1 md:py-3 border border-white/20 rounded-xl bg-white/10 text-white placeholder-white/45 focus:outline-none focus:border-red-400 focus:bg-white/15 transition-colors"
+                className="w-full px-4 py-1 md:py-3 border border-slate-300 rounded-xl bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-red-400 focus:bg-white transition-colors dark:border-white/20 dark:bg-white/10 dark:text-white dark:placeholder-white/45 dark:focus:bg-white/15"
                 placeholder="Enter your name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-white/80 mb-2">Email</label>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-white/80 mb-2">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-1 md:py-3 border border-white/20 rounded-xl bg-white/10 text-white placeholder-white/45 focus:outline-none focus:border-red-400 focus:bg-white/15 transition-colors"
+                className="w-full px-4 py-1 md:py-3 border border-slate-300 rounded-xl bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-red-400 focus:bg-white transition-colors dark:border-white/20 dark:bg-white/10 dark:text-white dark:placeholder-white/45 dark:focus:bg-white/15"
                 placeholder="Enter your email"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-white/80 mb-2">Password</label>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-white/80 mb-2">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-1 md:py-3 border border-white/20 rounded-xl bg-white/10 text-white placeholder-white/45 focus:outline-none focus:border-red-400 focus:bg-white/15 transition-colors"
+                className="w-full px-4 py-1 md:py-3 border border-slate-300 rounded-xl bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-red-400 focus:bg-white transition-colors dark:border-white/20 dark:bg-white/10 dark:text-white dark:placeholder-white/45 dark:focus:bg-white/15"
                 placeholder="Create a password"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-white/80 mb-2">Confirm Password</label>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-white/80 mb-2">Confirm Password</label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-1 md:py-3 border border-white/20 rounded-xl bg-white/10 text-white placeholder-white/45 focus:outline-none focus:border-red-400 focus:bg-white/15 transition-colors"
+                className="w-full px-4 py-1 md:py-3 border border-slate-300 rounded-xl bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-red-400 focus:bg-white transition-colors dark:border-white/20 dark:bg-white/10 dark:text-white dark:placeholder-white/45 dark:focus:bg-white/15"
                 placeholder="Confirm your password"
               />
             </div>
@@ -138,10 +138,10 @@ const Signup = ({ setAuthentication, setLoading }) => {
             </button>
           </form>
 
-          <div className="md:mt-8 md:pt-6  border-white/15">
-            <p className="text-center text-white/70 text-sm mb-3">
+          <div className="md:mt-8 md:pt-6 border-t border-slate-200 dark:border-white/15">
+            <p className="text-center text-slate-600 dark:text-white/70 text-sm mb-3">
               Already have an account?{' '}
-              <Link to="/login" className="font-semibold text-[#f3bf4a] hover:underline">
+              <Link to="/login" className="font-semibold text-red-600 dark:text-[#f3bf4a] hover:underline">
                 Sign in
               </Link>
             </p>

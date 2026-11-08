@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import { FaStar } from "react-icons/fa";
 import axios from "axios";
 import { tmdbImageUrl } from "../config/tmdbImage";
+import useImdbRating from "../hooks/useImdbRating";
 
 const Card = ({ id, title, img, vote, mediaType = "movie" }) => {
   const result = vote ? Math.floor(vote * 10) / 10 : "-";
   const detailsPath = mediaType === "tv" ? `/series/${id}` : `/movie/${id}`;
   const [providers, setProviders] = useState([]);
+  const imdbRating = useImdbRating(id, mediaType);
 
   useEffect(() => {
     const fetchProviders = async () => {
@@ -36,7 +38,7 @@ const Card = ({ id, title, img, vote, mediaType = "movie" }) => {
 
   return (
     <Link to={detailsPath} className="group">
-      <div className="relative rounded-xl overflow-hidden shadow-[0_10px_28px_rgba(0,0,0,0.45)] border border-white/10 group-hover:border-red-400/60 group-hover:scale-[1.03] group-hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+      <div className="relative rounded-xl overflow-hidden shadow-[0_10px_28px_rgba(18,24,38,0.12)] border border-slate-200 group-hover:border-red-400/60 group-hover:scale-[1.03] group-hover:-translate-y-0.5 transition-all duration-300 cursor-pointer dark:shadow-[0_10px_28px_rgba(0,0,0,0.45)] dark:border-white/10">
         <img src={img} alt={title} className="w-full h-auto aspect-[2/3] object-cover" loading="lazy" decoding="async" />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent"></div>
@@ -60,9 +62,15 @@ const Card = ({ id, title, img, vote, mediaType = "movie" }) => {
           <div className="text-white">
             <h3 className="text-sm font-semibold line-clamp-2">{title}</h3>
           </div>
-          <div className="text-white px-2 py-1 rounded-md bg-black/35 flex items-center text-sm">
-            <FaStar className="text-yellow-400 mr-1" /> {result}
-          </div>
+          {imdbRating !== null ? (
+            <div className="flex items-center gap-1 rounded-md bg-[#f5c518] px-2 py-1 text-xs font-extrabold text-black">
+              IMDb {imdbRating.toFixed(1)}
+            </div>
+          ) : (
+            <div className="text-white px-2 py-1 rounded-md bg-black/35 flex items-center text-sm">
+              <FaStar className="text-yellow-400 mr-1" /> {result}
+            </div>
+          )}
         </div>
       </div>
     </Link>

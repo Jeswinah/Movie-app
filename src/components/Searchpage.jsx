@@ -40,7 +40,7 @@ const SearchPage = () => {
 
   return (
     <div className="my-10 mx-5 min-h-screen">
-      <h1 className="text-2xl font-semibold mb-6 text-white">
+      <h1 className="text-2xl font-semibold mb-6 text-slate-900 dark:text-white">
         Search Results for: <span className="netflix-accent">{query}</span>
       </h1>
 
@@ -51,7 +51,7 @@ const SearchPage = () => {
         <p className="text-muted">No results found for "{query}".</p>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
         {results.map((item) => (
           <Card
             key={`${item.media_type || "movie"}-${item.id}`}

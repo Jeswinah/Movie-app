@@ -10,7 +10,10 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import authApi from "./config/authApi";
 import Series from "./pages/Series";
+import Watchlist from "./pages/Watchlist";
+import Profile from "./pages/Profile";
 import ChatbotWidget from "./components/ChatbotWidget";
+import ThemeToggle from "./components/ThemeToggle";
 
 
 function App() {
@@ -65,6 +68,8 @@ function App() {
             <>
               <Route path="/" element={<Home loading={loading} setLoading={setLoading} />} />
               <Route path="/series" element={<Series />} />
+              <Route path="/watchlist" element={<Watchlist />} />
+              <Route path="/profile" element={<Profile setAuthentication={setAuthentication} />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/movie/:id" element={<MovieDetails />} />
               <Route path="/series/:id" element={<MovieDetails />} />
@@ -76,6 +81,7 @@ function App() {
       </div>
       {authentication &&  !isDetailPage && !loading &&  <Footer />}
       {authentication && !isDetailPage && !loading && <ChatbotWidget />}
+      {!authentication && <ThemeToggle floating />}
     </>
   );
 }

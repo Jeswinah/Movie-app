@@ -166,16 +166,16 @@ const ChatbotWidget = () => {
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {open && (
-        <div className="mb-4 w-[320px] sm:w-[360px] h-[70vh] rounded-2xl border border-white/10 bg-black/80 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-xl flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#1a0a0a]/90 via-[#0f141a]/90 to-[#121826]/90 border-b border-white/10">
+        <div className="mb-4 w-[320px] sm:w-[360px] h-[70vh] rounded-2xl border border-slate-200 bg-white/95 text-slate-900 shadow-[0_25px_60px_rgba(18,24,38,0.2)] backdrop-blur-xl flex flex-col overflow-hidden dark:border-white/10 dark:bg-black/80 dark:text-white dark:shadow-[0_25px_60px_rgba(0,0,0,0.6)]">
+          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-red-50 via-white to-amber-50 border-b border-slate-200 dark:from-[#1a0a0a]/90 dark:via-[#0f141a]/90 dark:to-[#121826]/90 dark:border-white/10">
             <div>
-              <p className="text-sm uppercase tracking-[0.25em] text-red-400">MovieDb AI</p>
-              <p className="text-xs text-white/70">Powered by your assistant</p>
+              <p className="text-sm uppercase tracking-[0.25em] text-red-600 dark:text-red-400">MovieDb AI</p>
+              <p className="text-xs text-slate-500 dark:text-white/70">Powered by your assistant</p>
             </div>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="p-2 rounded-full hover:bg-white/10 transition"
+              className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 transition"
               aria-label="Close chatbot"
             >
               <FaTimes />
@@ -189,31 +189,31 @@ const ChatbotWidget = () => {
                 className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-md ${
                   msg.role === "user"
                     ? "ml-auto bg-red-500/90 text-white"
-                    : "bg-white/10 text-white"
+                    : "bg-slate-100 text-slate-800 dark:bg-white/10 dark:text-white"
                 }`}
               >
                 {msg.text}
               </div>
             ))}
             {isSending && (
-              <div className="max-w-[60%] rounded-2xl px-3 py-2 text-sm text-white/80 bg-white/10">
+              <div className="max-w-[60%] rounded-2xl px-3 py-2 text-sm text-slate-600 bg-slate-100 dark:text-white/80 dark:bg-white/10">
                 Thinking...
               </div>
             )}
             {error && (
-              <div className="text-xs text-red-300">{error}</div>
+              <div className="text-xs text-red-500 dark:text-red-300">{error}</div>
             )}
             <div ref={endRef} />
           </div>
 
-          <div className="p-3 border-t border-white/10 bg-gradient-to-r from-black/70 to-[#0f141a]/70">
-            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-2">
+          <div className="p-3 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-white dark:border-white/10 dark:from-black/70 dark:to-[#0f141a]/70">
+            <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-full px-3 py-2 dark:bg-white/5 dark:border-white/10">
               <input
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask about movies..."
-                className="flex-1 bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+                className="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none dark:text-white dark:placeholder:text-white/40"
                 aria-label="Chat message"
               />
               <button
@@ -223,7 +223,7 @@ const ChatbotWidget = () => {
                 className={`h-9 w-9 rounded-full flex items-center justify-center transition ${
                   canSend
                     ? "bg-red-500 text-white hover:bg-red-400"
-                    : "bg-white/10 text-white/40 cursor-not-allowed"
+                    : "bg-slate-200 text-slate-400 cursor-not-allowed dark:bg-white/10 dark:text-white/40"
                 }`}
                 aria-label="Send message"
               >

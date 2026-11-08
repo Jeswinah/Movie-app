@@ -45,8 +45,6 @@ const Home = ({loading,setLoading}) => {
     try {
       const tamilResponse = await tamilPromise;
       setTamilMovies(tamilResponse.data.results || []);
-      console.log(tamilMovies)
-      
     } catch (error) {
       console.error("Error fetching Tamil movies:", error);
       setTamilMovies([]);
@@ -129,7 +127,6 @@ const Home = ({loading,setLoading}) => {
     if (count >= 7) return recommendations.slice(0, 7);
     return recommendations;
   })();
-console.log(uniqueMovies.length,uniqueTamilMovies.length)
   return (
     loading?<Loading/>:(
 

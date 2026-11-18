@@ -62,8 +62,8 @@ const MovieDetails = () => {
   };
 
   const streamServers = [
-    { name: "CineSrc", url: streamUrl },
-    { name: "VidSrc.to", url: fallbackUrl }
+    { name: "VidSrc.to", url: fallbackUrl },
+    { name: "CineSrc", url: streamUrl }
   ];
   const activeServer = streamServers[serverIndex] || streamServers[0];
 

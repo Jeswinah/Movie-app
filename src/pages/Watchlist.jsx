@@ -46,8 +46,8 @@ const Watchlist = () => {
   }
 
   return (
-    <div className="min-h-screen w-full pb-10">
-      <h1 className="section-title text-5xl text-center py-5 text-slate-900 dark:text-white section-frame mt-10">
+    <div className="min-h-screen w-full bg-netflix pb-10">
+      <h1 className="section-title text-5xl text-center py-5 text-slate-900 dark:text-white bg-netflix mt-10">
         My Watchlist
       </h1>
 

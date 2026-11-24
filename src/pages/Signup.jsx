@@ -67,7 +67,7 @@ const Signup = ({ setAuthentication, setLoading }) => {
 
   return (
     <div className="relative max-h-screen overflow-hidden flex items-center justify-center px-3 py-6 sm:px-5 sm:py-10">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(229,9,20,0.08),transparent_33%),radial-gradient(circle_at_80%_12%,rgba(243,191,74,0.14),transparent_34%),linear-gradient(180deg,#fcfdff_0%,#f1f5f9_65%,#e6ebf2_100%)] dark:bg-[radial-gradient(circle_at_20%_15%,rgba(229,9,20,0.2),transparent_33%),radial-gradient(circle_at_80%_12%,rgba(243,191,74,0.1),transparent_34%),linear-gradient(180deg,#0b0b0b_0%,#0a1119_65%,#08090d_100%)]"></div>
+      <div className="absolute inset-0 bg-slate-50 dark:bg-[#08090c]"></div>
 
       {errorMsg && (
         <div className="absolute top-0 sm:top-10 left-1/2 transform -translate-x-1/2 z-50 w-[92%] sm:w-auto">

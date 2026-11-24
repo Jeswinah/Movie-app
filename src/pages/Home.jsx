@@ -1,5 +1,5 @@
 import Card from "../components/Card";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import MovieSlider from "../components/MovieSlider";
 import Loading from "./Loading";
@@ -9,28 +9,15 @@ import { tmdbImageUrl } from "../config/tmdbImage";
 const Home = ({loading,setLoading}) => {
   const [movies, setMovies] = useState([]);
   const [tamilMovies, setTamilMovies] = useState([]);
-  const [trendingTamilMovies, setTrendingTamilMovies] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
-  const [selectedGenre, setSelectedGenre] = useState("all");
+  const [selectedGenre] = useState("all");
   const [tamilPage, setTamilPage] = useState(0);
 
   const MOVIES_PER_PAGE = 28; // 4 rows × 7 columns
 
-  const genres = [
-    { label: "All", value: "all" },
-    { label: "Comedy", value: "comedy" },
-    { label: "Romance", value: "romance" },
-    { label: "Thriller", value: "thriller" },
-    { label: "Action", value: "action" },
-    { label: "Drama", value: "drama" },
-    { label: "Horror", value: "horror" },
-    { label: "Mystery", value: "mystery" }
-  ];
-
-  async function apihandler() {
+  const apihandler = useCallback(async () => {
     const popularPromise = axios.get(`${API_BASE_URL}/api/movies`);
     const tamilPromise = axios.get(`${API_BASE_URL}/api/movies/tamil`);
-    const trendingTamilPromise = axios.get(`${API_BASE_URL}/api/movies/tamil/trending`);
 
     try {
       const popularResponse = await popularPromise;
@@ -49,15 +36,7 @@ const Home = ({loading,setLoading}) => {
       console.error("Error fetching Tamil movies:", error);
       setTamilMovies([]);
     }
-
-    try {
-      const trendingResponse = await trendingTamilPromise;
-      setTrendingTamilMovies(trendingResponse.data.results || []);
-    } catch (error) {
-      console.error("Error fetching trending Tamil movies:", error);
-      setTrendingTamilMovies([]);
-    }
-  }
+  }, [setLoading]);
 
   async function fetchTamilMoviesByGenre(genre) {
     try {
@@ -75,7 +54,7 @@ const Home = ({loading,setLoading}) => {
   useEffect(() => {
     setLoading(true);
     apihandler();
-  }, [setLoading]);
+  }, [setLoading, apihandler]);
 
   useEffect(() => {
     fetchTamilMoviesByGenre(selectedGenre);
@@ -118,7 +97,6 @@ const Home = ({loading,setLoading}) => {
   const displayData = loading ? placeholderData : (movies || []);
   const uniqueMovies = deduplicateMovies(displayData);
   const uniqueTamilMovies = deduplicateMovies(tamilMovies);
-  const uniqueTrendingTamilMovies = deduplicateMovies(trendingTamilMovies);
   const recommendedMovies = (() => {
     const count = recommendations.length;
     if (count >= 28) return recommendations.slice(0, 28);

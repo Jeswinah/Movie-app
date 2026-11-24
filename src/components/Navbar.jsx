@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { SiThemoviedatabase } from "react-icons/si";
-import { FaSearch, FaStar, FaUser, FaBookmark } from "react-icons/fa";
+import { FaSearch, FaStar, FaBell, FaTimes } from "react-icons/fa";
 import API_BASE_URL from "../config/api";
 import { tmdbImageUrl } from "../config/tmdbImage";
 import ThemeToggle from "./ThemeToggle";
@@ -12,42 +11,64 @@ const Navbar = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loadingSuggest, setLoadingSuggest] = useState(false);
   const [showMobileTabs, setShowMobileTabs] = useState(true);
+  const [showNavbar, setShowNavbar] = useState(true);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef(null);
+  const searchInputRef = useRef(null);
   const debounceRef = useRef(null);
   const lastScrollY = useRef(0);
 
+  const isHomePage = location.pathname === "/";
   const isSeriesPage = location.pathname.startsWith("/series");
   const isWatchlistPage = location.pathname.startsWith("/watchlist");
-  const isProfilePage = location.pathname.startsWith("/profile");
-  const isMoviesPage = location.pathname === "/";
+  const isComingSoonPage = location.pathname.startsWith("/coming-soon");
+  const isFlatNavbarPage = isWatchlistPage || isComingSoonPage;
+  const navbarSurfaceClass = isComingSoonPage ? "bg-[#08090c]" : "bg-netflix";
+  const isDarkSurface =
+    isHomePage ||
+    isSeriesPage ||
+    isComingSoonPage ||
+    location.pathname.startsWith("/movie/") ||
+    location.pathname.startsWith("/series/");
 
   const navItems = [
-    { label: "Home", to: "/", isActive: isMoviesPage },
-    { label: "Series", to: "/series", isActive: isSeriesPage },
-    { label: "Watchlist", to: "/watchlist", isActive: isWatchlistPage }
+    { label: "Movies", to: "/", isActive: isHomePage },
+    { label: "TV Shows", to: "/series", isActive: isSeriesPage },
+    { label: "Coming Soon", to: "/coming-soon", isActive: isComingSoonPage },
+    { label: "My List", to: "/watchlist", isActive: isWatchlistPage }
   ];
+
+  const userName = localStorage.getItem("userName") || "My Profile";
+  const initial = userName.trim().charAt(0).toUpperCase();
+  const actionClass =
+    "grid h-10 w-10 place-items-center rounded-full border border-transparent text-slate-600 transition hover:bg-slate-900/5 hover:text-slate-900 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white";
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchval("");
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
 
   const handleSearch = () => {
     if (searchval.trim() !== "") {
       navigate(`/search?query=${encodeURIComponent(searchval)}`);
-      setSearchval("");
-      setSuggestions([]);
-      setShowSuggestions(false);
+      closeSearch();
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-    if (e.key === "Escape") {
-      setShowSuggestions(false);
-    }
+    if (e.key === "Enter") handleSearch();
+    if (e.key === "Escape") closeSearch();
   };
 
-  // fetch suggestions from TMDB (debounced)
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
+
   useEffect(() => {
     const q = searchval.trim();
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -78,11 +99,11 @@ const Navbar = () => {
     return () => clearTimeout(debounceRef.current);
   }, [searchval]);
 
-  // click outside to close suggestions
   useEffect(() => {
     const onDoc = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setShowSuggestions(false);
+        setShowNotifications(false);
       }
     };
     document.addEventListener("mousedown", onDoc);
@@ -93,23 +114,21 @@ const Navbar = () => {
     const onScroll = () => {
       const currentScrollY = window.scrollY;
       const isMobile = window.innerWidth < 768;
-      if (!isMobile) {
-        setShowMobileTabs(true);
-        lastScrollY.current = currentScrollY;
-        return;
-      }
-
       if (currentScrollY <= 8) {
+        setShowNavbar(true);
         setShowMobileTabs(true);
       } else {
         const delta = currentScrollY - lastScrollY.current;
         if (delta > 6) {
-          setShowMobileTabs(false);
+          setShowNavbar(false);
+          if (isMobile) setShowMobileTabs(false);
         } else if (delta < -6) {
+          setShowNavbar(true);
           setShowMobileTabs(true);
         }
       }
 
+      if (!isMobile) setShowMobileTabs(true);
       lastScrollY.current = currentScrollY;
     };
 
@@ -117,28 +136,35 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const inactiveActionClass =
-    "grid h-10 w-10 place-items-center rounded-full border border-transparent text-slate-600 transition-colors hover:border-slate-200 hover:bg-white hover:text-red-600 dark:text-white/80 dark:hover:border-white/15 dark:hover:bg-white/10 dark:hover:text-white";
-
   return (
-    <div className="fixed inset-x-0 top-0 z-50 glass-shell">
-      <div className="mx-auto flex w-full max-w-[1520px] items-center gap-2 px-4 py-3 sm:gap-3 sm:px-6 lg:px-8">
-        <Link to="/" className="flex shrink-0 items-center gap-2" title="MovieDB Home">
-          <SiThemoviedatabase className="h-9 w-9 text-slate-900 drop-shadow-sm dark:text-white" />
-          <span className="hidden display-title text-2xl leading-none tracking-wider text-slate-900 md:block dark:text-white">
-            Movie<span className="text-red-600 dark:text-red-500">DB</span>
+    <div
+      ref={wrapperRef}
+      className={`!fixed !inset-x-0 !top-0 p-2 z-50 transition-transform duration-300 ${
+        showNavbar ? "translate-y-0" : "-translate-y-full"
+      } ${isDarkSurface ? "dark" : ""} ${isFlatNavbarPage ? navbarSurfaceClass : ""}`}
+    >
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-0 bg-gradient-to-b from-[#08090c] via-[#08090c]/80 to-transparent ${
+          isFlatNavbarPage ? "hidden" : isDarkSurface ? "" : "hidden dark:block"
+        }`}
+      />
+      <div className="relative z-10 mx-auto flex w-full max-w-[1600px] items-center gap-4 px-3 py-1 md:px-6">
+        <Link to="/" className="flex shrink-0 items-center gap-2.5" title="MovieDB Home">
+          <span className="grid h-9 w-9 place-items-center rounded-lg bg-slate-900 text-xl font-black text-white dark:bg-white dark:text-[#0b0c0e]">
+            M
           </span>
+          <span className="display-title text-2xl tracking-wider text-slate-900 dark:text-white">MovieDB</span>
         </Link>
 
-        <nav className="hidden items-center gap-1 rounded-full border border-slate-200/80 bg-white/60 p-1 text-sm font-semibold shadow-sm dark:border-white/10 dark:bg-white/5 md:flex">
-          {navItems.filter((item) => item.to !== "/watchlist").map((item) => (
+        <nav className="hidden items-center gap-5 text-sm font-semibold lg:flex">
+          {navItems.map((item) => (
             <Link
-              key={item.to}
+              key={item.label}
               to={item.to}
-              className={`rounded-full px-3 py-1.5 transition-colors ${
+              className={`transition-colors ${
                 item.isActive
-                  ? "bg-red-600 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-200/60 hover:text-red-600 dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white"
+                  ? "text-slate-900 dark:text-white"
+                  : "text-slate-500 hover:text-slate-900 dark:text-white/55 dark:hover:text-white"
               }`}
             >
               {item.label}
@@ -146,52 +172,75 @@ const Navbar = () => {
           ))}
         </nav>
 
-        <Link
-          to="/watchlist"
-          className={`hidden items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold shadow-sm transition-colors md:inline-flex ${
-            isWatchlistPage
-              ? "border-red-600 bg-red-600 text-white"
-              : "border-slate-300 bg-white/60 text-slate-700 hover:border-red-400 hover:text-red-600 dark:border-white/15 dark:bg-white/5 dark:text-white/80 dark:hover:border-red-400/50 dark:hover:text-white"
-          }`}
-        >
-          <FaBookmark className="h-3.5 w-3.5" />
-          Watchlist
-        </Link>
+        <div className="ml-auto flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            aria-label="Search"
+            title="Search"
+            onClick={() => (searchOpen ? closeSearch() : setSearchOpen(true))}
+            className={actionClass}
+          >
+            {searchOpen ? <FaTimes /> : <FaSearch />}
+          </button>
+          <button
+            type="button"
+            aria-label="Notifications"
+            title="Notifications"
+            onClick={() => setShowNotifications((value) => !value)}
+            className={actionClass}
+          >
+            <FaBell />
+          </button>
+          <ThemeToggle
+            className="!border-transparent !bg-transparent !text-slate-600 hover:!bg-slate-900/5 hover:!text-slate-900 dark:!text-white/70 dark:hover:!bg-white/10 dark:hover:!text-white"
+            title=""
+          />
+          <Link
+            to="/profile"
+            title="My Profile"
+            aria-label="My Profile"
+            className="ml-1 flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 py-1.5 pl-1.5 pr-4 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-white dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/35 dark:hover:bg-white/10"
+          >
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-slate-900 text-xs font-black text-white dark:bg-white dark:text-[#0b0c0e]">
+              {initial}
+            </span>
+            <span className="hidden max-w-24 truncate sm:block">{userName}</span>
+          </Link>
+        </div>
+      </div>
 
-        <div className="relative ml-auto min-w-0 w-full max-w-md" ref={wrapperRef}>
-          <div className="relative">
+      {searchOpen && (
+        <div className="relative border-t border-slate-200 bg-white/95 px-5 py-3 dark:border-white/5 dark:bg-[#08090c]/95 md:px-10">
+          <div className="mx-auto flex max-w-[1600px] items-center gap-3">
+            <FaSearch className="text-slate-400 dark:text-white/40" />
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Search movies or series"
-              className="h-10 w-full rounded-full border border-slate-300 bg-white pl-4 pr-12 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-white/40 dark:focus:border-red-500/60"
+              className="h-9 w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-white/35"
               onChange={(e) => setSearchval(e.target.value)}
               onKeyDown={handleKeyDown}
               value={searchval}
-              onFocus={() => { if (suggestions.length) setShowSuggestions(true); }}
+              onFocus={() => {
+                if (suggestions.length) setShowSuggestions(true);
+              }}
             />
-            <button
-              type="button"
-              aria-label="Search"
-              className="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-red-600 text-white shadow transition hover:bg-red-700 active:scale-95"
-              onClick={handleSearch}
-            >
-              <FaSearch className="h-3.5 w-3.5" />
+            <button type="button" aria-label="Close search" onClick={closeSearch} className="text-slate-500 hover:text-slate-900 dark:text-white/50 dark:hover:text-white">
+              <FaTimes />
             </button>
           </div>
 
-          {/* Suggestions dropdown */}
           {showSuggestions && (
-            <div className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl suggestion-card shadow-xl">
-              {loadingSuggest && <div className="p-3 text-sm text-muted">Loading...</div>}
+            <div className="absolute inset-x-5 top-full z-50 mt-1 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-white/10 dark:bg-[#11151b] dark:shadow-2xl md:inset-x-10">
+              {loadingSuggest && <div className="p-3 text-sm text-slate-500 dark:text-white/60">Loading...</div>}
               {!loadingSuggest && suggestions.map((s) => (
                 <div
                   key={`${s.media_type || "movie"}-${s.id}`}
                   onClick={() => {
                     navigate(s.media_type === "tv" ? `/series/${s.id}` : `/movie/${s.id}`);
-                    setSearchval("");
-                    setShowSuggestions(false);
+                    closeSearch();
                   }}
-                  className="flex cursor-pointer items-center gap-3 border-b border-slate-100 px-3 py-2 last:border-0 hover:bg-slate-100 dark:border-white/5 dark:hover:bg-white/5"
+                  className="flex cursor-pointer items-center gap-3 border-b border-slate-100 px-3 py-2 last:border-0 hover:bg-slate-50 dark:border-white/5 dark:hover:bg-white/5"
                 >
                   <img
                     src={tmdbImageUrl(s.poster_path || s.backdrop_path, "w92")}
@@ -202,56 +251,45 @@ const Navbar = () => {
                   />
                   <div className="min-w-0">
                     <div className="truncate text-sm font-semibold text-slate-900 dark:text-white">{s.title || s.name}</div>
-                    <div className="text-xs text-muted">{s.release_date || s.first_air_date}</div>
+                    <div className="text-xs text-slate-500 dark:text-white/50">{s.release_date || s.first_air_date}</div>
                   </div>
                   <div className="ml-auto pr-1 text-sm text-slate-700 dark:text-white">
-                    <FaStar className="mr-1 inline text-amber-500 dark:text-yellow-400" />
+                    <FaStar className="mr-1 inline text-amber-400" />
                     {s.vote_average?.toFixed(1)}
                   </div>
                 </div>
               ))}
               {!loadingSuggest && suggestions.length === 0 && (
-                <div className="p-3 text-sm text-muted">No suggestions</div>
+                <div className="p-3 text-sm text-slate-500 dark:text-white/60">No suggestions</div>
               )}
             </div>
           )}
         </div>
+      )}
 
-        <div className="flex shrink-0 items-center gap-1.5">
-          <ThemeToggle />
-
-          <Link
-            to="/profile"
-            title="My Profile"
-            aria-label="My Profile"
-            className={`grid h-10 w-10 place-items-center rounded-full border transition-colors ${
-              isProfilePage
-                ? "border-red-200 bg-red-50 text-red-600 dark:border-red-500/40 dark:bg-red-500/15 dark:text-red-400"
-                : inactiveActionClass
-            }`}
-          >
-            <FaUser className="h-4 w-4" />
-          </Link>
+      {showNotifications && (
+        <div className="absolute right-8 top-full z-50 mt-1 w-64 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-xl dark:border-white/10 dark:bg-[#11151b] dark:text-white/70 dark:shadow-2xl md:right-10">
+          You are all caught up. New releases will appear here.
         </div>
-      </div>
+      )}
 
       <div
         className={`md:hidden absolute inset-x-0 top-full px-4 pt-2 transition-all duration-300 ${
           showMobileTabs ? "opacity-100 translate-y-0" : "pointer-events-none -translate-y-2 opacity-0"
         }`}
       >
-        <div className="mx-auto flex w-fit items-center gap-1 rounded-full border border-slate-200/80 bg-white/95 p-1 text-sm font-semibold shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-[#0f141a]/95">
+        <div className="mx-auto flex w-fit items-center gap-1 rounded-full border border-slate-200 bg-white/95 p-1 text-sm font-semibold shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-[#11151b]/95">
           {navItems.map((item) => (
             <Link
-              key={item.to}
+              key={item.label}
               to={item.to}
               className={`rounded-full px-4 py-1.5 transition-colors ${
                 item.isActive
-                  ? "bg-red-600 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-200/70 hover:text-red-600 dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white"
+                  ? "bg-slate-900 text-white dark:bg-white dark:text-[#0b0c0e]"
+                  : "text-slate-500 hover:text-slate-900 dark:text-white/60 dark:hover:text-white"
               }`}
             >
-              {item.label === "Home" ? "Movies" : item.label}
+              {item.label}
             </Link>
           ))}
         </div>

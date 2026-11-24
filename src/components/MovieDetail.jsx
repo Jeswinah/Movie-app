@@ -1,11 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
-import { FaStar, FaPlay, FaCalendar, FaClock, FaBookmark, FaRegBookmark, FaMapMarkerAlt } from "react-icons/fa";
+import {
+  FaStar,
+  FaPlay,
+  FaPlus,
+  FaCheck,
+  FaThumbsUp,
+  FaEllipsisH,
+  FaTimes,
+  FaMapMarkerAlt,
+  FaExternalLinkAlt
+} from "react-icons/fa";
 import API_BASE_URL from "../config/api";
 import authApi from "../config/authApi";
 import { tmdbImageUrl } from "../config/tmdbImage";
 import useImdbRating from "../hooks/useImdbRating";
+
+const formatRuntime = (minutes) => {
+  if (!minutes) return null;
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return hours ? `${hours}h ${mins}m` : `${mins}m`;
+};
+
+const AboutItem = ({ label, value }) => (
+  <div>
+    <p className="text-xs font-semibold uppercase tracking-wider text-white/40">{label}</p>
+    <p className="mt-1 text-sm leading-relaxed text-white/90">{value || "—"}</p>
+  </div>
+);
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -14,16 +38,26 @@ const MovieDetails = () => {
   const imdbRating = useImdbRating(id, isSeries ? "tv" : "movie");
   const [movie, setMovie] = useState(null);
   const [cast, setCast] = useState([]);
+  const [director, setDirector] = useState(null);
+  const [writers, setWriters] = useState([]);
+  const [producers, setProducers] = useState([]);
+  const [music, setMusic] = useState([]);
+  const [cinematography, setCinematography] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [season, setSeason] = useState(1);
   const [episode, setEpisode] = useState(1);
   const [availableSeasons, setAvailableSeasons] = useState([]);
   const [providers, setProviders] = useState([]);
+  const [trailer, setTrailer] = useState(null);
+  const [extras, setExtras] = useState([]);
+  const [activeVideo, setActiveVideo] = useState(null);
+  const [toast, setToast] = useState("");
+  const [liked, setLiked] = useState(false);
+  const toastTimer = useRef(null);
 
-  // Check if movie is currently in theaters (released within last 5 days)
   const isInTheaters = movie && !isSeries && movie.release_date && (
-    new Date(movie.release_date) > new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // within 5 days
+    new Date(movie.release_date) > new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
   );
   const [streamUrl, setStreamUrl] = useState(
     isSeries
@@ -39,9 +73,16 @@ const MovieDetails = () => {
   const [iframeKey, setIframeKey] = useState(0);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [watchlistBusy, setWatchlistBusy] = useState(false);
-  const [trailerKey, setTrailerKey] = useState(null);
 
-  const updateStreamUrl = async (streamEndpoint, selectedSeason = 1, selectedEpisode = 1) => {
+  const showToast = (message) => {
+    setToast(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(""), 2600);
+  };
+
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  const updateStreamUrl = useCallback(async (streamEndpoint, selectedSeason = 1, selectedEpisode = 1) => {
     try {
       const response = await axios.get(
         `${API_BASE_URL}${streamEndpoint}`,
@@ -59,7 +100,7 @@ const MovieDetails = () => {
     } catch (err) {
       console.error("Stream URL fetch failed:", err);
     }
-  };
+  }, [isSeries]);
 
   const streamServers = [
     { name: "VidSrc.to", url: fallbackUrl },
@@ -75,8 +116,7 @@ const MovieDetails = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const shouldAutoplay = params.get('autoplay') === 'true';
-    
-    // If autoplay, skip details and go straight to player
+
     if (shouldAutoplay) {
       setIsPlaying(true);
       setLoading(false);
@@ -95,19 +135,22 @@ const MovieDetails = () => {
         );
         setMovie(movieResponse.data);
 
-        // Fetch cast data
         try {
           const creditsResponse = await axios.get(
             `${API_BASE_URL}${creditsEndpoint}`,
             { timeout: 15000 }
           );
           setCast(creditsResponse.data.cast || []);
+          setDirector(creditsResponse.data.director || null);
+          setWriters(creditsResponse.data.writers || []);
+          setProducers(creditsResponse.data.producers || []);
+          setMusic(creditsResponse.data.music || []);
+          setCinematography(creditsResponse.data.cinematography || []);
         } catch (err) {
           console.error("Error fetching cast:", err);
           setCast([]);
         }
 
-        // Fetch watch providers
         try {
           const apiKey = import.meta.env.VITE_TMDB_API_KEY;
           const mediaType = isSeries ? 'tv' : 'movie';
@@ -158,7 +201,7 @@ const MovieDetails = () => {
     };
 
     fetchMovieDetails();
-  }, [id, location.search, isSeries]);
+  }, [id, location.search, isSeries, updateStreamUrl]);
 
   useEffect(() => {
     let isMounted = true;
@@ -169,11 +212,15 @@ const MovieDetails = () => {
           `${API_BASE_URL}/api/${isSeries ? "series" : "movie"}/${id}/videos`
         );
         if (isMounted) {
-          setTrailerKey(response.data?.trailer?.key || null);
+          setTrailer(response.data?.trailer || null);
+          setExtras(response.data?.extras || []);
         }
       } catch (error) {
         console.error("Error fetching trailer:", error);
-        if (isMounted) setTrailerKey(null);
+        if (isMounted) {
+          setTrailer(null);
+          setExtras([]);
+        }
       }
     };
 
@@ -221,6 +268,7 @@ const MovieDetails = () => {
       if (inWatchlist) {
         await authApi.delete(`/watchlist/${movie.id}`, { params: { mediaType } });
         setInWatchlist(false);
+        showToast("Removed from My List");
       } else {
         await authApi.post("/watchlist", {
           tmdbId: movie.id,
@@ -232,18 +280,38 @@ const MovieDetails = () => {
           releaseDate: movie.release_date || movie.first_air_date
         });
         setInWatchlist(true);
+        showToast("Added to My List");
       }
     } catch (error) {
       console.error("Error updating watchlist:", error);
+      showToast("Could not update My List");
     } finally {
       setWatchlistBusy(false);
     }
   };
 
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showToast("Link copied to clipboard");
+    } catch (error) {
+      console.error("Could not copy link:", error);
+      showToast("Could not copy link");
+    }
+  };
+
+  const openTrailer = () => {
+    if (!trailer) {
+      showToast("Trailer is not available for this title");
+      return;
+    }
+    setActiveVideo({ key: trailer.key, name: trailer.name || "Official Trailer", type: "Trailer" });
+  };
+
   if (loading) {
     return (
-      <div className="fixed inset-0 w-full h-screen bg-netflix-dark flex items-center justify-center">
-        <div className="text-slate-900 dark:text-white text-2xl">Loading...</div>
+      <div className="flex min-h-screen w-full items-center justify-center bg-[#08090c] text-lg text-white/70">
+        Loading...
       </div>
     );
   }
@@ -255,7 +323,7 @@ const MovieDetails = () => {
     };
 
     return (
-      <div className="fixed inset-0 w-full h-screen bg-black">
+      <div className="fixed inset-0 z-[100] w-full bg-black">
         <iframe
           key={iframeKey}
           src={activeServer.url}
@@ -263,12 +331,18 @@ const MovieDetails = () => {
           allowFullScreen
           allow="autoplay;"
           title="Movie Player"
-          className="w-full h-full"
+          className="h-full w-full"
           onError={handleIframeError}
         />
         <button
+          onClick={() => setIsPlaying(false)}
+          className="fixed left-5 top-5 z-50 flex items-center gap-2 rounded-full border border-white/20 bg-black/60 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md transition hover:bg-black/80"
+        >
+          <FaTimes /> Back
+        </button>
+        <button
           onClick={cycleServer}
-          className="fixed top-5 left-1/2 -translate-x-1/2 bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-all z-50"
+          className="fixed left-1/2 top-5 z-50 -translate-x-1/2 rounded-full bg-white/20 px-3 py-1.5 text-xs text-white backdrop-blur-sm transition hover:bg-white/30"
           title="Switch streaming server"
         >
           {activeServer.name}
@@ -279,94 +353,92 @@ const MovieDetails = () => {
 
   if (!movie) {
     return (
-      <div className="fixed inset-0 w-full h-screen bg-netflix-dark flex items-center justify-center">
-        <div className="text-slate-900 dark:text-white text-2xl">Movie not found</div>
+      <div className="flex min-h-screen w-full items-center justify-center bg-[#08090c] text-lg text-white/70">
+        Movie not found
       </div>
     );
   }
 
+  const title = movie.title || movie.name;
+  const releaseYear = (movie.release_date || movie.first_air_date || "").slice(0, 4);
+  const runtime = movie.runtime || movie.episode_run_time?.[0];
+  const endTime = runtime
+    ? new Date(Date.now() + runtime * 60000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+    : null;
+  const displayRating = imdbRating ?? Number(movie.vote_average || 0);
+  const likedPercent = Math.round(Number(movie.vote_average || 0) * 10);
+  const genreNames = (movie.genres || []).map((genre) => genre.name);
+  const releaseDate = movie.release_date || movie.first_air_date || "";
+  const releaseLabel = releaseDate
+    ? new Date(releaseDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+    : null;
+  const originalTitle = movie.original_title || movie.original_name || title;
+  const originalLanguage = movie.spoken_languages?.[0]?.english_name || movie.original_language || null;
+  const countries = (movie.production_countries || []).map((country) => country.name).join(", ");
+  const studios = (movie.production_companies || []).map((company) => company.name).join(", ");
+  const imdbUrl = movie.imdb_id
+    ? `https://www.imdb.com/title/${movie.imdb_id}/`
+    : `https://www.imdb.com/find/?q=${encodeURIComponent(title)}`;
+  const tmdbUrl = `https://www.themoviedb.org/${isSeries ? "tv" : "movie"}/${id}`;
+  const videos = [
+    trailer ? { key: trailer.key, name: trailer.name || "Official Trailer", type: "Trailer" } : null,
+    ...extras.map((video) => ({
+      key: video.key,
+      name: video.name || title,
+      type: video.type || "Video"
+    }))
+  ].filter((video) => video?.key);
+
+  const roundButtonClass =
+    "grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 text-base text-white backdrop-blur-md transition hover:border-white/50 hover:bg-white/20 disabled:opacity-50";
+
   return (
-    <div className="w-screen min-h-screen bg-netflix-dark overflow-x-hidden">
-      {/* Hero Section with Backdrop */}
-      <div className="relative w-full h-screen bg-cover bg-center flex items-center"
-        style={{
-          backgroundImage: `url(${tmdbImageUrl(movie.backdrop_path, "w1280")})`,
-          backgroundAttachment: 'fixed'
-        }}
-      >
-        <div className="absolute inset-0 w-full h-full bg-black/15"></div>
+    <div className="min-h-screen overflow-x-hidden bg-[#08090c] text-white">
+      <section className="relative min-h-[100svh] w-full overflow-hidden bg-[#08090c]">
+        {movie.backdrop_path ? (
+          <img
+            src={tmdbImageUrl(movie.backdrop_path, "w1280")}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-[#08090c]" />
+        )}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,7,9,0.96)_0%,rgba(6,7,9,0.78)_38%,rgba(6,7,9,0.12)_76%,rgba(6,7,9,0.4)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,#08090c_0%,rgba(8,9,12,0)_48%)]" />
 
-        <div className="relative z-10 flex flex-col justify-end items-left w-full h-full px-8 md:px-10 mb-10">
-          <div className="flex flex-col md:flex-row gap-8 bg-black/50 p-6 rounded-lg shadow-lg">
-            <img
-              src={tmdbImageUrl(movie.poster_path, "w342")}
-              alt={movie.title || movie.name}
-              className="w-64 rounded-lg shadow-2xl hidden md:block"
-              loading="eager"
-              decoding="async"
-            />
+        <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1500px] flex-col justify-center px-6 pb-10 pt-32 md:px-12 lg:px-20">
+          <div className="w-full">
+            <div className="max-w-2xl">
+              <h1 className="display-title text-[clamp(3.5rem,7vw,6.5rem)] font-bold uppercase leading-[0.9] tracking-wide text-white drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)]">
+                {title}
+              </h1>
 
-            <div className="flex-1 text-white">
-              <h1 className=" text-5xl md:text-6xl font-bold mb-4">{movie.title || movie.name}</h1>
-              
-              <div className="flex items-center gap-4 mb-4 text-lg">
-                <div className="flex items-center gap-2">
-                  {imdbRating !== null ? (
-                    <>
-                      <span className="rounded bg-[#f5c518] px-1.5 py-0.5 text-xs font-extrabold text-black">
-                        IMDb
-                      </span>
-                      <span>{imdbRating.toFixed(1)}/10</span>
-                    </>
-                  ) : (
-                    <>
-                      <FaStar className="text-yellow-400" />
-                      <span>{movie.vote_average.toFixed(1)}/10</span>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <FaCalendar />
-                  <span>{movie.release_date || movie.first_air_date}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FaClock />
-                  <span>{movie.runtime || movie.episode_run_time?.[0] || "-"} min</span>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                {movie.genres.map((genre) => (
-                  <span
-                    key={genre.id}
-                    className="inline-block bg-black rounded-full px-4 py-1 text-sm mr-2 mb-2"
-                  >
-                    {genre.name}
+              <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold text-white/75 md:text-base">
+                {genreNames.length > 0 && <span>{genreNames.join(" · ")}</span>}
+                {releaseYear && <span>{releaseYear}</span>}
+                {runtime && <span>{formatRuntime(runtime)}</span>}
+                {endTime && <span>Ends {endTime}</span>}
+                <span className="flex items-center gap-1 text-amber-400">
+                  <FaStar /> {Number(displayRating).toFixed(1)}
+                </span>
+                {likedPercent > 0 && (
+                  <span className="flex items-center gap-1 text-emerald-400">
+                    <FaThumbsUp /> {likedPercent}% liked
                   </span>
-                ))}
+                )}
               </div>
 
-              {providers.length > 0 && (
-                <div className="mb-6 flex flex-wrap gap-4 items-center">
-                  <span className="text-gray-300 font-semibold text-lg">Stream on:</span>
-                  {providers.map((provider) => (
-                    <img
-                      key={provider.provider_id}
-                      src={tmdbImageUrl(provider.logo_path, "w45") || `https://image.tmdb.org/t/p/w45${provider.logo_path}`}
-                      alt={provider.provider_name}
-                      title={provider.provider_name}
-                      className="w-10 h-10 rounded-lg shadow-md border border-white/20"
-                    />
-                  ))}
-                </div>
-              )}
-
-              <p className="text-lg mb-6 max-w-3xl leading-relaxed max-h-52 overflow-y-hidden">{movie.overview}</p>
+              <p className="mt-5 line-clamp-4 max-w-xl text-[15px] leading-relaxed text-white/85 md:text-base">
+                {movie.overview}
+              </p>
 
               {isSeries && availableSeasons.length > 0 && (
-                <div className="flex flex-wrap gap-3 mb-6">
-                  <div>
-                    <label className="block text-sm mb-1">Season</label>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <label className="text-xs font-semibold uppercase tracking-widest text-white/50">
+                    Season
                     <select
                       value={season}
                       onChange={(e) => {
@@ -375,18 +447,17 @@ const MovieDetails = () => {
                         setEpisode(1);
                         updateStreamUrl(`/api/series/stream/${id}`, selectedSeason, 1);
                       }}
-                      className="bg-black/70 border border-white/30 rounded-lg px-3 py-2"
+                      className="ml-2 rounded-full border border-white/20 bg-[#11151b]/90 px-3 py-2 text-sm font-semibold normal-case tracking-normal text-white outline-none focus:border-white/60"
                     >
                       {availableSeasons.map((s) => (
                         <option key={s.id || s.season_number} value={s.season_number}>
-                          Season {s.season_number}
+                          {s.season_number}
                         </option>
                       ))}
                     </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm mb-1">Episode</label>
+                  </label>
+                  <label className="text-xs font-semibold uppercase tracking-widest text-white/50">
+                    Episode
                     <select
                       value={episode}
                       onChange={(e) => {
@@ -394,7 +465,7 @@ const MovieDetails = () => {
                         setEpisode(selectedEpisode);
                         updateStreamUrl(`/api/series/stream/${id}`, season, selectedEpisode);
                       }}
-                      className="bg-black/70 border border-white/30 rounded-lg px-3 py-2"
+                      className="ml-2 rounded-full border border-white/20 bg-[#11151b]/90 px-3 py-2 text-sm font-semibold normal-case tracking-normal text-white outline-none focus:border-white/60"
                     >
                       {Array.from(
                         {
@@ -404,91 +475,232 @@ const MovieDetails = () => {
                         (_, idx) => idx + 1
                       ).map((ep) => (
                         <option key={ep} value={ep}>
-                          Episode {ep}
+                          {ep}
                         </option>
                       ))}
                     </select>
-                  </div>
+                  </label>
                 </div>
               )}
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="mt-8 flex flex-wrap items-center gap-3">
                 {isInTheaters ? (
                   <button
                     disabled
-                    className="bg-gray-600 text-white font-bold py-2.5 px-6 rounded-lg flex items-center gap-2 text-base transition-all shadow-lg cursor-not-allowed opacity-70"
+                    className="flex h-12 cursor-not-allowed items-center gap-2 rounded-full bg-white/15 px-7 font-semibold text-white/70"
                   >
-                    <FaMapMarkerAlt className="text-sm" /> In Theatres
+                    <FaMapMarkerAlt /> In Theatres
                   </button>
                 ) : (
                   <button
                     onClick={() => setIsPlaying(true)}
-                    className="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg flex items-center gap-2 text-base transition-all shadow-lg hover:scale-105"
+                    className="flex h-12 items-center gap-2 rounded-full bg-white px-7 font-bold text-[#0b0c0e] shadow-lg transition hover:scale-[1.03] hover:bg-white/90"
                   >
-                    <FaPlay className="text-sm" /> Play Now
+                    <FaPlay /> Play
                   </button>
                 )}
                 <button
+                  onClick={openTrailer}
+                  className="flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 font-semibold text-white backdrop-blur-md transition hover:border-white/40 hover:bg-white/20"
+                >
+                  <FaPlay /> Trailer
+                </button>
+                <button
                   onClick={toggleWatchlist}
                   disabled={watchlistBusy}
-                  title={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
-                  aria-label={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
-                  className={`h-11 w-11 rounded-lg flex items-center justify-center text-lg transition-all shadow-lg border disabled:opacity-60 disabled:cursor-not-allowed ${
-                    inWatchlist
-                      ? "bg-white/15 hover:bg-white/25 text-white border-white/40"
-                      : "bg-black/50 hover:bg-black/70 text-white border-white/25 hover:scale-105"
+                  title={inWatchlist ? "Remove from My List" : "Add to My List"}
+                  aria-label={inWatchlist ? "Remove from My List" : "Add to My List"}
+                  className={roundButtonClass}
+                >
+                  {inWatchlist ? <FaCheck /> : <FaPlus />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLiked((value) => !value)}
+                  title={liked ? "Unlike this title" : "Like this title"}
+                  aria-label={liked ? "Unlike this title" : "Like this title"}
+                  aria-pressed={liked}
+                  className={`grid h-12 w-12 shrink-0 place-items-center rounded-full border text-base backdrop-blur-md transition ${
+                    liked
+                      ? "border-emerald-400/60 bg-emerald-400/20 text-emerald-400 hover:border-emerald-300 hover:bg-emerald-400/30"
+                      : "border-white/20 bg-white/10 text-white hover:border-white/50 hover:bg-white/20"
                   }`}
                 >
-                  {inWatchlist ? <FaBookmark /> : <FaRegBookmark />}
+                  <FaThumbsUp />
+                </button>
+                <button
+                  onClick={copyLink}
+                  title="Copy link"
+                  aria-label="Copy link"
+                  className={roundButtonClass}
+                >
+                  <FaEllipsisH />
                 </button>
               </div>
+
+              {providers.length > 0 && (
+                <div className="mt-8 flex flex-wrap items-center gap-3">
+                  <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+                    Available on
+                  </span>
+                  {providers.slice(0, 6).map((provider) => (
+                    <img
+                      key={provider.provider_id}
+                      src={tmdbImageUrl(provider.logo_path, "w92")}
+                      alt={provider.provider_name}
+                      title={provider.provider_name}
+                      className="h-9 w-9 rounded-lg border border-white/15 bg-black/40 object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ))}
+                </div>
+              )}
             </div>
+
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Trailer Section */}
-      {trailerKey && (
-        <div className="w-full py-12 px-8 md:px-20 bg-slate-100 dark:bg-[#0f141a]">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Trailer</h2>
-          <div className="mx-auto max-w-4xl aspect-video overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-white/10">
-            <iframe
-              src={`https://www.youtube.com/embed/${trailerKey}`}
-              title={`${movie.title || movie.name} trailer`}
-              className="h-full w-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              loading="lazy"
-            />
+      {videos.length > 0 && (
+        <section className="relative z-20 mx-auto max-w-[1500px] px-6 pb-16 md:px-12 lg:px-20">
+          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Trailers &amp; Extras</h2>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {videos.slice(0, 6).map((video) => (
+              <button
+                key={video.key}
+                onClick={() => setActiveVideo(video)}
+                className="group overflow-hidden rounded-xl border border-white/10 bg-white/5 text-left transition hover:border-white/30 hover:bg-white/10"
+              >
+                <div className="relative aspect-video overflow-hidden bg-black">
+                  <img
+                    src={`https://img.youtube.com/vi/${video.key}/hqdefault.jpg`}
+                    alt=""
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span className="absolute inset-0 grid place-items-center bg-black/25">
+                    <span className="grid h-12 w-12 place-items-center rounded-full bg-white/90 text-[#0b0c0e] shadow-lg">
+                      <FaPlay />
+                    </span>
+                  </span>
+                </div>
+                <div className="px-4 py-3">
+                  <p className="truncate text-sm font-semibold text-white">{video.name}</p>
+                  <p className="mt-0.5 text-xs text-white/50">{video.type}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {cast.length > 0 && (
+        <section className="relative z-20 border-t border-white/10 bg-[#0b0d11] px-6 py-14 md:px-12 lg:px-20">
+          <div className="mx-auto max-w-[1500px]">
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Cast</h2>
+            <div className="mt-6 grid grid-cols-3 gap-6 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+              {cast.slice(0, 16).map((actor) => (
+                <div key={actor.id} className="flex flex-col items-center text-center transition hover:scale-105">
+                  {actor.profile_path ? (
+                    <img
+                      src={tmdbImageUrl(actor.profile_path, "w185")}
+                      alt={actor.name}
+                      className="h-24 w-24 rounded-full border-2 border-white/20 object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <div className="grid h-24 w-24 place-items-center rounded-full border-2 border-white/15 bg-white/5 text-xs text-white/40">
+                      No image
+                    </div>
+                  )}
+                  <p className="mt-2 w-full truncate text-sm font-semibold text-white">{actor.name}</p>
+                  <p className="w-full truncate text-xs text-white/50">{actor.character}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="relative z-20 mx-auto max-w-[1500px] px-6 pb-16 md:px-12 lg:px-20">
+        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">About</h2>
+        <div className="mt-6 rounded-2xl border border-white/10 bg-[#0c0e12] p-6 md:p-8">
+          <p className="max-w-3xl text-sm leading-relaxed text-white/70 md:text-base">
+            {movie.overview}
+          </p>
+          <div className="mt-8 grid gap-x-8 gap-y-7 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-5">
+              <AboutItem label="Directed by" value={director} />
+              <AboutItem label="Written by" value={writers.join(", ")} />
+              <AboutItem label="Produced by" value={producers.join(", ")} />
+              <AboutItem label="Music by" value={music.join(", ")} />
+              <AboutItem label="Cinematography" value={cinematography.join(", ")} />
+            </div>
+            <div className="space-y-5">
+              <AboutItem label="Released" value={releaseLabel} />
+              <AboutItem label="Genres" value={genreNames.join(", ")} />
+              <AboutItem label="Original Title" value={originalTitle} />
+              <AboutItem label="Countries" value={countries} />
+            </div>
+            <div className="space-y-5">
+              <AboutItem label="Runtime" value={formatRuntime(runtime)} />
+              <AboutItem label="Original Language" value={originalLanguage} />
+              <AboutItem label="Studios" value={studios} />
+            </div>
+          </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href={imdbUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/20"
+            >
+              IMDb <FaExternalLinkAlt className="text-xs" />
+            </a>
+            <a
+              href={tmdbUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/20"
+            >
+              TMDB <FaExternalLinkAlt className="text-xs" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {activeVideo && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          onClick={() => setActiveVideo(null)}
+        >
+          <div className="relative w-full max-w-5xl" onClick={(event) => event.stopPropagation()}>
+            <button
+              onClick={() => setActiveVideo(null)}
+              aria-label="Close video"
+              className="absolute -top-12 right-0 grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
+            >
+              <FaTimes />
+            </button>
+            <div className="aspect-video overflow-hidden rounded-xl bg-black shadow-2xl">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideo.key}?autoplay=1`}
+                title={activeVideo.name}
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
           </div>
         </div>
       )}
 
-      {/* Cast Section - Scrollable */}
-      {cast.length > 0 && (
-        <div className="w-full py-12 px-8 md:px-20 bg-slate-100 dark:bg-[#0f141a]">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">Cast</h2>
-          <div className="grid grid-cols-3 gap-6 md:grid-cols-8">
-            {cast.map((actor) => (
-              <div key={actor.id} className="flex flex-col items-center hover:scale-110 transition-transform">
-                {actor.profile_path ? (
-                  <img
-                    src={tmdbImageUrl(actor.profile_path, "w185")}
-                    alt={actor.name}
-                    className="w-24 h-24 rounded-full object-cover p-1 content-center border-2 border-red-600"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-500">
-                    <span className="text-gray-400 text-xs">No Img</span>
-                  </div>
-                )}
-                <p className="text-slate-900 dark:text-white font-semibold text-sm mt-2 text-center w-20 truncate">{actor.name}</p>
-                <p className="text-slate-500 dark:text-gray-400 text-xs text-center w-20 truncate">{actor.character}</p>
-              </div>
-            ))}
-          </div>
+      {toast && (
+        <div className="fixed bottom-8 left-1/2 z-[80] -translate-x-1/2 rounded-full border border-white/15 bg-white/10 px-5 py-2.5 text-sm text-white shadow-xl backdrop-blur-md">
+          {toast}
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import axios from 'axios'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import baseurl from '../config/api'
 import { tmdbImageUrl } from '../config/tmdbImage'
 
@@ -57,7 +57,7 @@ const Login = ({ setAuthentication, setLoading }) => {
 
   return (
     <div className="relative max-h-screen flex items-center justify-center px-3 py-6 sm:px-5 sm:py-10">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(229,9,20,0.08),transparent_35%),radial-gradient(circle_at_85%_10%,rgba(243,191,74,0.14),transparent_30%),linear-gradient(180deg,#fcfdff_0%,#f1f5f9_65%,#e6ebf2_100%)] dark:bg-[radial-gradient(circle_at_15%_20%,rgba(229,9,20,0.22),transparent_35%),radial-gradient(circle_at_85%_10%,rgba(243,191,74,0.08),transparent_30%),linear-gradient(180deg,#0b0b0b_0%,#0a1119_65%,#08090d_100%)]"></div>
+      <div className="absolute inset-0 bg-slate-50 dark:bg-[#08090c]"></div>
 
       {errorMsg && (
         <div className='absolute top-6 sm:top-10 left-1/2 transform -translate-x-1/2 z-50 w-[92%] sm:w-auto'>
@@ -131,17 +131,6 @@ const Login = ({ setAuthentication, setLoading }) => {
               </button>
             </form>
 
-            <div className="mt-8 sm:mt-10 pt-6 border-t border-slate-200 dark:border-white/15">
-              <p className="text-center text-slate-600 dark:text-white/70 text-sm mb-3">
-                New here?{' '}
-                <Link to="/signup" className="font-semibold text-red-600 dark:text-[#f3bf4a] hover:underline">
-                  Create an account
-                </Link>
-              </p>
-              <p className="text-center text-slate-400 dark:text-white/45 text-xs sm:text-sm">
-                {new Date().toDateString()}
-              </p>
-            </div>
           </div>
         </div>
       </div>

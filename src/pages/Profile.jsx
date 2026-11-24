@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   FaCalendar,
   FaBookmark,
-  FaTrash,
   FaSignOutAlt,
   FaCheckCircle,
   FaExclamationCircle
@@ -12,19 +11,19 @@ import Loading from "./Loading";
 import authApi from "../config/authApi";
 
 const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/15 dark:border-white/15 dark:text-white dark:placeholder-white/35 dark:focus:border-red-500/60";
+  "w-full rounded-lg border border-slate-200 bg-transparent px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/10 dark:border-white/10 dark:text-white dark:placeholder-white/35 dark:focus:border-red-500/60";
 
 const labelClass =
-  "block text-sm font-semibold text-slate-700 dark:text-white/70 mb-1.5";
+  "mb-1.5 block text-sm font-medium text-slate-700 dark:text-white/70";
 
 const cardClass =
-  "rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-white/10 dark:bg-[#0f141a] dark:shadow-none";
+  "rounded-xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#11151b]";
 
 const primaryButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60";
 
 const secondaryButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-transparent px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-60 disabled:cursor-not-allowed dark:border-white/15 dark:text-white/80 dark:hover:bg-white/10";
+  "inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-transparent px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:text-white/80 dark:hover:bg-white/5";
 
 const Profile = ({ setAuthentication }) => {
   const [profile, setProfile] = useState(null);
@@ -36,7 +35,6 @@ const Profile = ({ setAuthentication }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState(null);
   const navigate = useNavigate();
 
@@ -131,28 +129,6 @@ const Profile = ({ setAuthentication }) => {
     navigate("/login");
   };
 
-  const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(
-      "Delete your account? This permanently removes your profile and watchlist."
-    );
-    if (!confirmed) return;
-
-    setDeleting(true);
-    try {
-      await authApi.delete("/profile");
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("userEmail");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("isAuthenticated");
-      setAuthentication(false);
-      navigate("/login");
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      showMessage("error", error.response?.data?.message || "Could not delete account");
-      setDeleting(false);
-    }
-  };
-
   if (loading) {
     return <Loading />;
   }
@@ -172,7 +148,7 @@ const Profile = ({ setAuthentication }) => {
   });
 
   return (
-    <div className="-mt-16 min-h-screen w-full bg-slate-50 pb-16 pt-16 dark:bg-[#0f141a]">
+    <div className="-mt-16 min-h-screen w-full bg-[var(--app-bg)] pb-16 pt-16">
       {message && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60]">
           <div
@@ -186,24 +162,24 @@ const Profile = ({ setAuthentication }) => {
         </div>
       )}
 
-      <h1 className="section-title text-4xl text-center py-5 text-slate-900 dark:text-white mt-10">
-        Profile
-      </h1>
+      <div className="mx-auto max-w-5xl space-y-5 px-4 pt-10 sm:px-6">
+        <h1 className="section-title text-4xl text-slate-900 dark:text-white">
+          Profile
+        </h1>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
-        <div className={`${cardClass} flex flex-col sm:flex-row sm:items-center gap-5`}>
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-red-600 text-3xl font-bold text-white">
+        <div className={`${cardClass} flex flex-col gap-4 sm:flex-row sm:items-center`}>
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-red-600 text-2xl font-bold text-white">
             {initial}
           </div>
 
           <div className="min-w-0 flex-1">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white truncate">
+            <h2 className="truncate text-xl font-bold text-slate-900 dark:text-white">
               {profile.user.name}
             </h2>
-            <p className="text-sm text-slate-500 dark:text-white/60 truncate">
+            <p className="truncate text-sm text-slate-500 dark:text-white/60">
               {profile.user.email}
             </p>
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-white/50">
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-white/55">
               <span className="inline-flex items-center gap-1.5">
                 <FaCalendar />
                 Member since {memberSince}
@@ -228,115 +204,92 @@ const Profile = ({ setAuthentication }) => {
           </button>
         </div>
 
-        <form onSubmit={handleProfileSubmit} className={cardClass}>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-            Account Details
-          </h3>
-          <p className="text-sm text-slate-500 dark:text-white/60 mb-5">
-            Update your name and email address.
-          </p>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className={labelClass}>Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className={inputClass}
-                placeholder="Your name"
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={inputClass}
-                placeholder="Your email"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={savingProfile}
-            className={`${primaryButtonClass} mt-5`}
-          >
-            {savingProfile ? "Saving..." : "Save Changes"}
-          </button>
-        </form>
-
-        <form onSubmit={handlePasswordSubmit} className={cardClass}>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-            Password
-          </h3>
-          <p className="text-sm text-slate-500 dark:text-white/60 mb-5">
-            Change your account password.
-          </p>
-
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div>
-              <label className={labelClass}>Current Password</label>
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className={inputClass}
-                placeholder="Current password"
-              />
-            </div>
-            <div>
-              <label className={labelClass}>New Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className={inputClass}
-                placeholder="At least 6 characters"
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className={inputClass}
-                placeholder="Repeat new password"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={savingPassword}
-            className={`${secondaryButtonClass} mt-5`}
-          >
-            {savingPassword ? "Updating..." : "Update Password"}
-          </button>
-        </form>
-
-        <div className="rounded-xl border border-red-200 bg-slate-50 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 dark:border-red-500/25 dark:bg-[#0f141a]">
-          <div>
-            <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
-              <FaTrash />
-              Delete Account
+        <div className="grid gap-5 lg:grid-cols-2">
+          <form onSubmit={handleProfileSubmit} className={cardClass}>
+            <h3 className="mb-5 text-lg font-bold text-slate-900 dark:text-white">
+              Account Details
             </h3>
-            <p className="text-sm text-slate-500 dark:text-white/60 mt-1">
-              Permanently remove your profile and watchlist. This cannot be undone.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={handleDeleteAccount}
-            disabled={deleting}
-            className="inline-flex items-center justify-center rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
-          >
-            {deleting ? "Deleting..." : "Delete Account"}
-          </button>
+
+            <div className="grid gap-4">
+              <div>
+                <label className={labelClass}>Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={inputClass}
+                  placeholder="Your name"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClass}
+                  placeholder="Your email"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={savingProfile}
+              className={`${primaryButtonClass} mt-5`}
+            >
+              {savingProfile ? "Saving..." : "Save Changes"}
+            </button>
+          </form>
+
+          <form onSubmit={handlePasswordSubmit} className={cardClass}>
+            <h3 className="mb-5 text-lg font-bold text-slate-900 dark:text-white">
+              Password
+            </h3>
+
+            <div className="grid gap-4">
+              <div>
+                <label className={labelClass}>Current Password</label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className={inputClass}
+                  placeholder="Current password"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className={inputClass}
+                  placeholder="At least 6 characters"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Confirm Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={inputClass}
+                  placeholder="Repeat new password"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={savingPassword}
+              className={`${secondaryButtonClass} mt-5`}
+            >
+              {savingPassword ? "Updating..." : "Update Password"}
+            </button>
+          </form>
         </div>
+
       </div>
     </div>
   );

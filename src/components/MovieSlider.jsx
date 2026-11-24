@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaStar, FaBookmark, FaRegBookmark, FaMapMarkerAlt } from "react-icons/fa";
+import {
+  FaStar,
+  FaPlay,
+  FaPlus,
+  FaCheck,
+  FaThumbsUp,
+  FaEllipsisH,
+  FaTimes,
+  FaMapMarkerAlt
+} from "react-icons/fa";
 import axios from "axios";
 import authApi from "../config/authApi";
+import API_BASE_URL from "../config/api";
 import { tmdbImageUrl } from "../config/tmdbImage";
 import useImdbRating from "../hooks/useImdbRating";
 
@@ -11,14 +21,19 @@ const MovieSlider = ({ movies, mediaType = "movie", setLoading }) => {
   const [providersCache, setProvidersCache] = useState({});
   const [watchlistKeys, setWatchlistKeys] = useState(() => new Set());
   const [watchlistBusyId, setWatchlistBusyId] = useState(null);
+  const [trailers, setTrailers] = useState({});
+  const [activeTrailer, setActiveTrailer] = useState(null);
+  const [toast, setToast] = useState("");
+  const [liked, setLiked] = useState({});
   const rootRef = useRef(null);
   const requestedRef = useRef(new Set());
+  const trailerRequestedRef = useRef(new Set());
+  const toastTimer = useRef(null);
 
-  // Deduplicate movies by ID
   const uniqueMovies = React.useMemo(() => {
     if (!movies) return [];
     const seen = new Set();
-    return movies.filter(movie => {
+    return movies.filter((movie) => {
       if (seen.has(movie.id)) {
         return false;
       }
@@ -27,7 +42,6 @@ const MovieSlider = ({ movies, mediaType = "movie", setLoading }) => {
     });
   }, [movies]);
 
-  // Auto-slide every 5s
   useEffect(() => {
     if (!uniqueMovies || uniqueMovies.length === 0) return;
     const interval = setInterval(() => {
@@ -35,7 +49,6 @@ const MovieSlider = ({ movies, mediaType = "movie", setLoading }) => {
     }, 5000);
     return () => clearInterval(interval);
   }, [uniqueMovies]);
-
 
   useEffect(() => {
     setCurrent(0);
@@ -66,6 +79,14 @@ const MovieSlider = ({ movies, mediaType = "movie", setLoading }) => {
     };
   }, []);
 
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  const showToast = (message) => {
+    setToast(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(""), 2600);
+  };
+
   const activeMovie = uniqueMovies[current];
   const imdbRating = useImdbRating(activeMovie?.id, mediaType);
 
@@ -92,6 +113,20 @@ const MovieSlider = ({ movies, mediaType = "movie", setLoading }) => {
       });
   }, [activeMovie, mediaType]);
 
+  useEffect(() => {
+    if (!activeMovie?.id || trailerRequestedRef.current.has(activeMovie.id)) return;
+    trailerRequestedRef.current.add(activeMovie.id);
+
+    axios
+      .get(`${API_BASE_URL}/api/${mediaType === "tv" ? "series" : "movie"}/${activeMovie.id}/videos`)
+      .then((response) => {
+        setTrailers((prev) => ({ ...prev, [activeMovie.id]: response.data?.trailer || null }));
+      })
+      .catch(() => {
+        setTrailers((prev) => ({ ...prev, [activeMovie.id]: null }));
+      });
+  }, [activeMovie, mediaType]);
+
   const toggleWatchlist = async (movie) => {
     if (!movie || watchlistBusyId) return;
 
@@ -107,6 +142,7 @@ const MovieSlider = ({ movies, mediaType = "movie", setLoading }) => {
           next.delete(key);
           return next;
         });
+        showToast("Removed from My List");
       } else {
         await authApi.post("/watchlist", {
           tmdbId: movie.id,
@@ -118,143 +154,224 @@ const MovieSlider = ({ movies, mediaType = "movie", setLoading }) => {
           releaseDate: movie.release_date || movie.first_air_date
         });
         setWatchlistKeys((prev) => new Set(prev).add(key));
+        showToast("Added to My List");
       }
     } catch (error) {
       console.error("Error updating watchlist:", error);
+      showToast("Could not update My List");
     } finally {
       setWatchlistBusyId(null);
     }
   };
 
+  const openTrailer = (movie) => {
+    const trailer = trailers[movie.id];
+    if (trailer?.key) {
+      setActiveTrailer(trailer.key);
+    } else {
+      showToast("Trailer is not available for this title");
+    }
+  };
+
+  const copyLink = async (movie) => {
+    const path = mediaType === "tv" ? `/series/${movie.id}` : `/movie/${movie.id}`;
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}${path}`);
+      showToast("Link copied to clipboard");
+    } catch (error) {
+      console.error("Could not copy link:", error);
+      showToast("Could not copy link");
+    }
+  };
+
   if (!uniqueMovies || uniqueMovies.length === 0) return null;
 
+  const roundButtonClass =
+    "grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 text-base text-white backdrop-blur-md transition hover:border-white/50 hover:bg-white/20 disabled:opacity-50";
+
   return (
-    <div ref={rootRef} className="relative w-full h-[calc(100vh)] overflow-hidden -mt-16">
-      {/* Slides: render all and fade between them */}
+    <div ref={rootRef} className="relative h-[100svh] w-full overflow-hidden bg-black">
       {uniqueMovies.map((movie, idx) => {
         const isActive = idx === current;
         const inWatchlist = watchlistKeys.has(`${mediaType}:${movie.id}`);
+        const detailsPath = mediaType === "tv" ? `/series/${movie.id}` : `/movie/${movie.id}`;
+        const playPath = `${detailsPath}?autoplay=true`;
+        const rating = isActive && imdbRating !== null ? imdbRating : Number(movie.vote_average || 0);
+        const likedPercent = Math.round(Number(movie.vote_average || 0) * 10);
+        const isInTheaters =
+          mediaType === "movie" &&
+          movie.release_date &&
+          new Date(movie.release_date) > new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+        const motionClass = `transition-all duration-700 ${
+          isActive ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+        }`;
+
         return (
           <div
             key={`slider-${movie.id}`}
-            className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out bg-black ${
-              isActive ? "opacity-100 scale-100 z-20" : "opacity-0 scale-105 z-10"
+            className={`absolute inset-0 h-full w-full  bg-black transition-all duration-1000 ease-in-out ${
+              isActive ? "z-20 scale-100 opacity-100" : "z-10 scale-105 opacity-0"
             }`}
             aria-hidden={!isActive}
           >
             <img
               src={tmdbImageUrl(movie.backdrop_path, "w1280")}
               alt={movie.title || movie.name}
-              className="w-full h-full object-cover object-top "
+              className="absolute inset-0 h-full w-full object-cover object-center"
               loading={isActive ? "eager" : "lazy"}
               decoding="async"
               fetchPriority={isActive ? "high" : "low"}
             />
 
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/80"></div>
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,7,9,0.96)_0%,rgba(6,7,9,0.78)_38%,rgba(6,7,9,0.12)_76%,rgba(6,7,9,0.4)_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(6,7,9,0.85)_0%,rgba(6,7,9,0)_55%)]" />
 
-            <div className="absolute inset-0 flex flex-col justify-end px-6 pb-20">
-              <h2 className={`text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg transition-all duration-700 delay-300 ${
-                isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              }`}>
-                {movie.title || movie.name}
-              </h2>
-              <p className={`text-white max-w-2xl mb-4 text-sm md:text-lg drop-shadow-md transition-all duration-700 delay-500 ${
-                isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              }`}>
-                {movie.overview}
-              </p>
+            <div className="absolute inset-0 z-20 flex flex-col justify-end px-6 pb-24 pt-32 md:px-12 lg:px-20">
+              <div className="mx-auto w-full max-w-[1500px]">
+                <div className="flex flex-col items-start">
+                <h1
+                  className={`display-title text-[clamp(3rem,7vw,6rem)] font-bold uppercase leading-[0.9] tracking-wide text-white drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] ${motionClass}`}
+                >
+                  {movie.title || movie.name}
+                </h1>
 
-              <div className={`flex items-center gap-2 mb-3 transition-all duration-700 delay-600 ${
-                isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              }`}>
-                {isActive && imdbRating !== null ? (
-                  <>
-                    <span className="rounded bg-[#f5c518] px-2 py-0.5 text-sm font-extrabold text-black">
-                      IMDb
-                    </span>
-                    <span className="text-white font-bold text-xl">{imdbRating.toFixed(1)}/10</span>
-                  </>
-                ) : (
-                  <>
-                    <FaStar className="text-yellow-400 text-xl" />
-                    <span className="text-white font-bold text-xl">{movie.vote_average?.toFixed(1)}/10</span>
-                  </>
-                )}
-              </div>
-
-              {isActive && providersCache[movie.id]?.length > 0 && (
-                <div className={`flex items-center gap-3 mb-4 transition-all duration-700 delay-700 ${
-                  isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-                }`}>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-white/60">
-                    Stream on
+                <div
+                  className={`mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold text-white/75 md:text-base ${motionClass}`}
+                >
+                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Featured</span>
+                  {(movie.release_date || movie.first_air_date || "").slice(0, 4) && (
+                    <span>{(movie.release_date || movie.first_air_date || "").slice(0, 4)}</span>
+                  )}
+                  <span className="flex items-center gap-1 text-amber-400">
+                    <FaStar /> {Number(rating).toFixed(1)}
                   </span>
-                  <div className="flex items-center gap-2">
+                  {likedPercent > 0 && (
+                    <span className="flex items-center gap-1 text-emerald-400">
+                      <FaThumbsUp /> {likedPercent}% liked
+                    </span>
+                  )}
+                </div>
+
+                <p
+                  className={`mt-5 line-clamp-3 max-w-xl text-[15px] leading-relaxed text-white/85 md:text-base ${motionClass}`}
+                >
+                  {movie.overview}
+                </p>
+
+                <div className={`mt-8 flex flex-wrap items-center gap-3 ${motionClass}`}>
+                  {isInTheaters ? (
+                    <button
+                      disabled
+                      className="flex h-12 cursor-not-allowed items-center gap-2 rounded-full bg-white/15 px-7 font-semibold text-white/70"
+                    >
+                      <FaMapMarkerAlt /> In Theatres
+                    </button>
+                  ) : (
+                    <Link to={playPath}>
+                      <button className="flex h-12 items-center gap-2 rounded-full bg-white px-7 font-bold text-[#0b0c0e] shadow-lg transition hover:scale-[1.03] hover:bg-white/90">
+                        <FaPlay /> Play
+                      </button>
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => openTrailer(movie)}
+                    className="flex h-12 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 font-semibold text-white backdrop-blur-md transition hover:border-white/40 hover:bg-white/20"
+                  >
+                    <FaPlay /> Trailer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleWatchlist(movie)}
+                    disabled={watchlistBusyId === movie.id}
+                    title={inWatchlist ? "Remove from My List" : "Add to My List"}
+                    aria-label={inWatchlist ? "Remove from My List" : "Add to My List"}
+                    className={roundButtonClass}
+                  >
+                    {inWatchlist ? <FaCheck /> : <FaPlus />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLiked((prev) => ({ ...prev, [movie.id]: !prev[movie.id] }))}
+                    title={liked[movie.id] ? "Unlike this title" : "Like this title"}
+                    aria-label={liked[movie.id] ? "Unlike this title" : "Like this title"}
+                    aria-pressed={Boolean(liked[movie.id])}
+                    className={`grid h-12 w-12 shrink-0 place-items-center rounded-full border text-base backdrop-blur-md transition ${
+                      liked[movie.id]
+                        ? "border-emerald-400/60 bg-emerald-400/20 text-emerald-400 hover:border-emerald-300 hover:bg-emerald-400/30"
+                        : "border-white/20 bg-white/10 text-white hover:border-white/50 hover:bg-white/20"
+                    }`}
+                  >
+                    <FaThumbsUp />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => copyLink(movie)}
+                    title="Copy link"
+                    aria-label="Copy link"
+                    className={roundButtonClass}
+                  >
+                    <FaEllipsisH />
+                  </button>
+                </div>
+
+                {providersCache[movie.id]?.length > 0 && (
+                  <div className={`mt-8 flex items-center gap-3 ${motionClass}`}>
+                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+                      Available on
+                    </span>
                     {providersCache[movie.id].map((provider) => (
                       <img
                         key={provider.provider_id}
                         src={tmdbImageUrl(provider.logo_path, "w92")}
                         alt={provider.provider_name}
                         title={provider.provider_name}
-                        className="h-9 w-9 rounded-lg border border-white/20 bg-black/40 object-cover shadow-md"
+                        className="h-9 w-9 rounded-lg border border-white/15 bg-black/40 object-cover"
                         loading="lazy"
                         decoding="async"
                       />
                     ))}
                   </div>
+                )}
                 </div>
-              )}
 
-              <div className={`flex items-center gap-3 transition-all duration-700 delay-700 ${
-                isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              }`}>
-                {(() => {
-                  const isInTheaters = mediaType === "movie" && 
-                    movie.release_date && 
-                    new Date(movie.release_date) > new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
-                  
-                  if (isInTheaters) {
-                    return (
-                      <button
-                        disabled
-                        className="bg-gray-600 text-white font-medium rounded-md w-44 h-12 shadow-lg cursor-not-allowed opacity-70 flex items-center justify-center gap-2"
-                      >
-                        <FaMapMarkerAlt className="text-sm" /> In Theatres
-                      </button>
-                    );
-                  }
-                  
-                  return (
-                    <Link
-                      to={mediaType === "tv" ? `/series/${movie.id}?autoplay=true` : `/movie/${movie.id}?autoplay=true`}
-                    >
-                      <button className="bg-red-600 text-white font-medium rounded-md w-44 h-12 shadow-lg hover:cursor-pointer hover:opacity-50 transition-all">
-                        Watch Now
-                      </button>
-                    </Link>
-                  );
-                })()}
-
-                <button
-                  type="button"
-                  onClick={() => toggleWatchlist(movie)}
-                  disabled={watchlistBusyId === movie.id}
-                  title={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
-                  aria-label={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
-                  className={`grid h-12 w-12 place-items-center rounded-md border text-lg shadow-lg backdrop-blur-sm transition-all disabled:opacity-60 ${
-                    inWatchlist
-                      ? "border-red-500 bg-red-600 text-white hover:bg-red-700"
-                      : "border-white/40 bg-white/10 text-white hover:border-white hover:bg-white/20"
-                  }`}
-                >
-                  {inWatchlist ? <FaBookmark /> : <FaRegBookmark />}
-                </button>
               </div>
             </div>
           </div>
         );
       })}
+
+      {activeTrailer && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          onClick={() => setActiveTrailer(null)}
+        >
+          <div className="relative w-full max-w-5xl" onClick={(event) => event.stopPropagation()}>
+            <button
+              onClick={() => setActiveTrailer(null)}
+              aria-label="Close video"
+              className="absolute -top-12 right-0 grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
+            >
+              <FaTimes />
+            </button>
+            <div className="aspect-video overflow-hidden rounded-xl bg-black shadow-2xl">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeTrailer}?autoplay=1`}
+                title="Trailer"
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div className="fixed bottom-8 left-1/2 z-[80] -translate-x-1/2 rounded-full border border-white/15 bg-white/10 px-5 py-2.5 text-sm text-white shadow-xl backdrop-blur-md">
+          {toast}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaSearch, FaStar, FaBell, FaTimes } from "react-icons/fa";
+import { FaSearch, FaStar, FaBell, FaTimes, FaBars } from "react-icons/fa";
 import API_BASE_URL from "../config/api";
 import { tmdbImageUrl } from "../config/tmdbImage";
 import ThemeToggle from "./ThemeToggle";
@@ -10,10 +10,10 @@ const Navbar = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loadingSuggest, setLoadingSuggest] = useState(false);
-  const [showMobileTabs, setShowMobileTabs] = useState(true);
   const [showNavbar, setShowNavbar] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const wrapperRef = useRef(null);
@@ -70,6 +70,10 @@ const Navbar = () => {
   }, [searchOpen]);
 
   useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
     const q = searchval.trim();
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!q) {
@@ -104,31 +108,34 @@ const Navbar = () => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setShowSuggestions(false);
         setShowNotifications(false);
+        setMobileMenuOpen(false);
       }
     };
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
     document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
   useEffect(() => {
     const onScroll = () => {
       const currentScrollY = window.scrollY;
-      const isMobile = window.innerWidth < 768;
       if (currentScrollY <= 8) {
         setShowNavbar(true);
-        setShowMobileTabs(true);
       } else {
         const delta = currentScrollY - lastScrollY.current;
         if (delta > 6) {
           setShowNavbar(false);
-          if (isMobile) setShowMobileTabs(false);
         } else if (delta < -6) {
           setShowNavbar(true);
-          setShowMobileTabs(true);
         }
       }
 
-      if (!isMobile) setShowMobileTabs(true);
       lastScrollY.current = currentScrollY;
     };
 
@@ -175,6 +182,17 @@ const Navbar = () => {
         <div className="ml-auto flex shrink-0 items-center gap-1">
           <button
             type="button"
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
+            title={mobileMenuOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMobileMenuOpen((value) => !value)}
+            className={`lg:hidden ${actionClass}`}
+          >
+            {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+          <button
+            type="button"
             aria-label="Search"
             title="Search"
             onClick={() => (searchOpen ? closeSearch() : setSearchOpen(true))}
@@ -208,6 +226,30 @@ const Navbar = () => {
           </Link>
         </div>
       </div>
+
+      {mobileMenuOpen && (
+        <nav
+          id="mobile-navigation"
+          aria-label="Mobile navigation"
+          className="absolute inset-x-2 top-full z-30 rounded-2xl border border-slate-200 bg-white/95 p-2 shadow-xl backdrop-blur-md dark:border-white/10 dark:bg-[#11151b]/95 dark:shadow-2xl lg:hidden"
+        >
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              aria-current={item.isActive ? "page" : undefined}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`block rounded-xl px-4 py-3 text-sm font-semibold transition-colors ${
+                item.isActive
+                  ? "bg-slate-900 text-white dark:bg-white dark:text-[#0b0c0e]"
+                  : "text-slate-600 hover:bg-slate-900/5 hover:text-slate-900 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      )}
 
       {searchOpen && (
         <div className="relative border-t border-slate-200 bg-white/95 px-5 py-3 dark:border-white/5 dark:bg-[#08090c]/95 md:px-10">
@@ -273,27 +315,6 @@ const Navbar = () => {
         </div>
       )}
 
-      <div
-        className={`md:hidden absolute inset-x-0 top-full px-4 pt-2 transition-all duration-300 ${
-          showMobileTabs ? "opacity-100 translate-y-0" : "pointer-events-none -translate-y-2 opacity-0"
-        }`}
-      >
-        <div className="mx-auto flex w-fit items-center gap-1 rounded-full border border-slate-200 bg-white/95 p-1 text-sm font-semibold shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-[#11151b]/95">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className={`rounded-full px-4 py-1.5 transition-colors ${
-                item.isActive
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-[#0b0c0e]"
-                  : "text-slate-500 hover:text-slate-900 dark:text-white/60 dark:hover:text-white"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

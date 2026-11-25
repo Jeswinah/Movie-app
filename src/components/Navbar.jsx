@@ -217,7 +217,7 @@ const Navbar = () => {
             to="/profile"
             title="My Profile"
             aria-label="My Profile"
-            className="ml-1 flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 py-1.5 pl-1.5 pr-4 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-white dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/35 dark:hover:bg-white/10"
+            className="ml-1 hidden items-center gap-2 rounded-full border border-slate-200 bg-white/70 py-1.5 pl-1.5 pr-4 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-white dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/35 dark:hover:bg-white/10 lg:flex"
           >
             <span className="grid h-8 w-8 place-items-center rounded-full bg-slate-900 text-xs font-black text-white dark:bg-white dark:text-[#0b0c0e]">
               {initial}
@@ -248,6 +248,24 @@ const Navbar = () => {
               {item.label}
             </Link>
           ))}
+          <div className="mt-2 border-t border-slate-200 pt-2 dark:border-white/10">
+            <Link
+              to="/profile"
+              aria-current={location.pathname.startsWith("/profile") ? "page" : undefined}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-900/5 hover:text-slate-900 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-900 text-xs font-black text-white dark:bg-white dark:text-[#0b0c0e]">
+                {initial}
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-white/45">
+                  Profile
+                </span>
+                <span className="block truncate">{userName}</span>
+              </span>
+            </Link>
+          </div>
         </nav>
       )}
 
